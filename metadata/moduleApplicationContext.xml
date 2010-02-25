@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE beans PUBLIC "-//SPRING//DTD BEAN//EN" "http://www.springframework.org/dtd/spring-beans.dtd">
+
+<!-- Beans to add to the current Application context definition -->
+  
+<beans>
+	
+    <bean id="pcsLabInterfaceUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
+    	<property name="order"><value>4</value></property>
+    	<property name="mappings">
+            <props>
+                <!--
+				<prop key="formTaskpane.htm">formTaskpaneRedirect</prop>
+				<prop key="module/pcslabinterface/pcsLabInterfaceError.list">pcsLabInterfaceErrorList</prop>
+				<prop key="module/pcslabinterface/xsnUpload.form">xsnUploadForm</prop>
+				<prop key="module/pcslabinterface/migratePcsLabInterfaceArchive.form">migratePcsLabInterfaceForm</prop>
+				
+				 Dynamic PcsLabInterface
+				<prop key="module/pcslabinterface/dynamicForm.form">dynamicPcsLabInterfaceController</prop>
+				<prop key="module/pcslabinterface/batchForm.form">batchPcsLabInterfaceController</prop>
+				<prop key="module/pcslabinterface/patientForm.form">patientPcsLabInterfaceController</prop>
+				
+				<prop key="module/pcslabinterface/taskpane/encounter.htm">encounterTaskpaneController</prop>
+				-->
+			</props>
+		</property>
+	</bean>
+	
+	<bean parent="serviceContext">
+		<property name="moduleService">
+			<list>
+				<value>org.openmrs.module.pcslabinterface.PcsLabInterfaceService</value> <!-- service interface name -->
+				<bean class="org.springframework.transaction.interceptor.TransactionProxyFactoryBean">
+					<property name="transactionManager"><ref bean="transactionManager"/></property>
+					<property name="target">
+						<bean class="org.openmrs.module.pcslabinterface.impl.PcsLabInterfaceServiceImpl">
+						</bean>
+					</property>
+					<property name="preInterceptors">
+						<list>
+							<ref bean="authorizationInterceptor"/>
+						</list>
+					</property>
+					<property name="transactionAttributeSource">
+						<bean class="org.springframework.transaction.annotation.AnnotationTransactionAttributeSource"/>
+					</property>
+				</bean>
+			</list>
+		</property>
+	</bean>
+	
+	<!-- Controllers
+	
+	<bean id="formTaskpaneRedirect" class="org.openmrs.web.controller.RedirectController">
+		<property name="redirectView"><value>/module/pcslabinterface/formTaskpane</value></property>
+	</bean>
+	
+	<bean id="pcsLabInterfaceErrorList" class="org.openmrs.module.pcslabinterface.web.controller.PcsLabInterfaceErrorListController">
+		<property name="commandName"><value>pcsLabInterfaceErrorList</value></property>
+		<property name="formView"><value>/module/pcslabinterface/pcsLabInterfaceErrorList</value></property>
+		<property name="successView"><value>pcsLabInterfaceError.list</value></property>
+	</bean>
+	
+	<bean id="xsnUploadForm" class="org.openmrs.module.pcslabinterface.web.controller.XsnUploadFormController">
+		<property name="commandName"><value>formList</value></property>
+		<property name="formView"><value>/module/pcslabinterface/xsnUploadForm</value></property>
+		<property name="successView"><value>xsnUpload.form</value></property>
+	</bean>
+	<bean id="migratePcsLabInterfaceForm" class="org.openmrs.module.pcslabinterface.web.controller.MigratePcsLabInterfaceArchiveFormController">
+		<property name="commandName"><value>migratePcsLabInterface</value></property>
+		<property name="formView"><value>/module/pcslabinterface/migratePcsLabInterfaceArchiveForm</value></property>
+		<property name="successView"><value>migratePcsLabInterfaceArchive.form</value></property>
+	</bean>
+	
+	<bean id="dynamicPcsLabInterfaceController" class="org.openmrs.module.pcslabinterface.web.dynamic.DynamicPcsLabInterfaceController">
+		<property name="commandName"><value>formInProgress</value></property>
+		<property name="formView"><value>/module/pcslabinterface/dynamic/enter</value></property>
+		<property name="successView"><value>patientDashboard.form</value></property>
+	</bean>
+
+	<bean id="batchPcsLabInterfaceController" class="org.openmrs.module.pcslabinterface.web.dynamic.BatchPcsLabInterfaceController">
+		<property name="sessionForm"><value>true</value></property>
+		<property name="commandName"><value>formData</value></property>
+		<property name="commandClass"><value>org.openmrs.module.pcslabinterface.web.dynamic.BatchPcsLabInterfaceModel</value></property>
+		<property name="formView"><value>/module/pcslabinterface/dynamic/batch</value></property>
+		<property name="successView"><value>patientDashboard.form</value></property>
+	</bean>
+
+	<bean id="patientPcsLabInterfaceModelValidator" class="org.openmrs.module.pcslabinterface.web.dynamic.PatientPcsLabInterfaceModelValidator"/>
+	<bean id="patientPcsLabInterfaceController" class="org.openmrs.module.pcslabinterface.web.dynamic.PatientPcsLabInterfaceController">
+		<property name="sessionForm"><value>true</value></property>
+		<property name="commandName"><value>formData</value></property>
+		<property name="commandClass"><value>org.openmrs.module.pcslabinterface.web.dynamic.PatientPcsLabInterfaceModel</value></property>
+		<property name="validator"><ref bean="patientPcsLabInterfaceModelValidator"/></property>
+		<property name="formView"><value>/module/pcslabinterface/dynamic/patientForm</value></property>
+		<property name="successView"><value>patientDashboard.form</value></property>
+	</bean>
+	
+	<bean id="encounterTaskpaneController" class="org.openmrs.module.pcslabinterface.web.controller.EncounterTaskpaneController">
+		<property name="commandName"><value>encounters</value></property>
+		<property name="commandClass"><value>java.util.List</value></property>
+		<property name="formView"><value>/module/pcslabinterface/taskpane/encounter</value></property>
+		<property name="successView"><value>encounter.htm</value></property>
+	</bean>
+	
+	 /Controllers -->
+	
+</beans>

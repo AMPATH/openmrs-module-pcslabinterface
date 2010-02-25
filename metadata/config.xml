@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//OpenMRS//DTD OpenMRS Config 1.0//EN" "http://resources.openmrs.org/doctype/config-1.0.dtd">
+
+<module configVersion="1.0">
+	
+	<!-- Base Module Properties -->
+	<id>pcslabinterface</id>
+	<name>PcsLabInterface</name>
+	<version>3.3.4</version>
+	<package>org.openmrs.module.pcslabinterface</package>
+	<author>Ben Wolfe, Jeremy Keiper</author>
+	<description>
+			OpenMRS PcsLabInterface
+	</description>
+	<activator>org.openmrs.module.pcslabinterface.PcsLabInterfaceActivator</activator>
+
+	<updateURL>https://dev.openmrs.org/modules/download/pcslabinterface/update.rdf</updateURL>
+	<!-- /Base Module Properties -->
+	
+	<require_version>1.3.1</require_version>
+	
+	<!-- Extensions -->
+	<extension>
+		<point>org.openmrs.admin.list</point>
+		<class>org.openmrs.module.pcslabinterface.extension.html.PcsLabInterfaceAdminExt</class>
+	</extension>
+	<!-- /Extensions -->
+	
+	
+	<!-- AOP -->
+	<!-- /AOP -->
+	
+	
+	<!-- Required Privileges -->
+	<privilege>
+		<name>PcsLabInterface</name>
+		<description>Allows user to access PcsLabInterface pages/functions</description>
+	</privilege>
+	<privilege>
+		<name>Add PcsLabInterfaceQueue</name>
+		<description>Allows user to add a queue item to database</description>
+	</privilege>
+	<privilege>
+		<name>View PcsLabInterfaceQueue</name>
+		<description>Allows user to view the queue items</description>
+	</privilege>
+	<privilege>
+		<name>Edit PcsLabInterfaceQueue</name>
+		<description>Allows the user to edit the pcslabinterface queue</description>
+	</privilege>
+	<privilege>
+		<name>Delete PcsLabInterfaceQueue</name>
+		<description>Allows the user to delete pcslabinterface queue items</description>
+	</privilege>
+	<!-- /Required Privileges -->
+
+
+	<!-- Required Global Properties -->
+	<globalProperty>
+		<property>pcslabinterface.infopath_server_url</property> <!-- Must start with `moduleId.` -->
+		<defaultValue></defaultValue>
+		<description> When uploading an XSN, this url is used as the "base path".  (Should be something like http://localhost:8080/openmrs)</description>
+	</globalProperty>
+	<globalProperty>
+		<property>pcslabinterface.queue_dir</property> <!-- Must start with `moduleId.` -->
+		<defaultValue>pcslabinterface/queue</defaultValue>
+		<description>
+			Directory containing the pcslabinterface queue items. This will contain xml files submitted by
+			infopath.  These items are awaiting processing to be turned into hl7 queue items
+		</description>
+	</globalProperty>
+	<globalProperty>
+		<property>pcslabinterface.queue_archive_dir</property> <!-- Must start with `moduleId.` -->
+		<defaultValue>pcslabinterface/archive/%Y/%M</defaultValue>
+		<description>
+			Directory containing the pcslabinterface archive items.  This will contain xml files that have
+			been submitted by infopath and then processed sucessfully into hl7.
+			Certain date parameters will be replaced with the current date:
+			%Y = four digit year
+			%M = two digit month
+			%D = two digit date of the month
+			%w = week of the year
+     		%W = week of the month
+		</description>
+	</globalProperty>
+	
+	<!-- /Required Global Properties -->
+
+	<!-- Servlets -->
+	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
+	<!-- #### TEMPORARY ACCESS TO QUEUE PROCESSING SERVLETS (Burke 3/18/2006) #### -->
+	<servlet>
+		<servlet-name>pcsLabInterfaceQueueProcessor</servlet-name>
+		<servlet-class>org.openmrs.module.pcslabinterface.web.PcsLabInterfaceQueueProcessorServlet</servlet-class>
+	</servlet>
+	<!-- #### TEMPORARY ACCESS TO QUEUE PROCESSING SERVLETS (Burke 3/18/2006) #### -->
+	<!-- /Servlets -->
+	
+	
+	<!-- Internationalization -->
+	<!-- All message codes should start with moduleId.* -->
+	<messages>
+		<lang>en</lang>
+		<file>messages.properties</file>
+	</messages>
+	<messages>
+		<lang>fr</lang>
+		<file>messages_fr.properties</file>
+	</messages>
+	<messages>
+		<lang>es</lang>
+		<file>messages_es.properties</file>
+	</messages>
+	<!-- /Internationalization -->
+
+    <!--
+	<mappingFiles>
+	</mappingFiles>
+	-->
+	
+</module>
