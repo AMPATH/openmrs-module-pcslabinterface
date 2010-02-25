@@ -6,7 +6,7 @@
 	<!-- Base Module Properties -->
 	<id>pcslabinterface</id>
 	<name>PcsLabInterface</name>
-	<version>3.3.4</version>
+	<version>0.1</version>
 	<package>org.openmrs.module.pcslabinterface</package>
 	<author>Ben Wolfe, Jeremy Keiper</author>
 	<description>
@@ -34,7 +34,7 @@
 	<!-- Required Privileges -->
 	<privilege>
 		<name>PcsLabInterface</name>
-		<description>Allows user to access PcsLabInterface pages/functions</description>
+		<description>Allows user to access PCSLabInterface pages/functions</description>
 	</privilege>
 	<privilege>
 		<name>Add PcsLabInterfaceQueue</name>
@@ -46,35 +46,30 @@
 	</privilege>
 	<privilege>
 		<name>Edit PcsLabInterfaceQueue</name>
-		<description>Allows the user to edit the pcslabinterface queue</description>
+		<description>Allows the user to edit the PCSLabInterface queue</description>
 	</privilege>
 	<privilege>
 		<name>Delete PcsLabInterfaceQueue</name>
-		<description>Allows the user to delete pcslabinterface queue items</description>
+		<description>Allows the user to delete PCSLabInterface queue items</description>
 	</privilege>
 	<!-- /Required Privileges -->
 
 
 	<!-- Required Global Properties -->
 	<globalProperty>
-		<property>pcslabinterface.infopath_server_url</property> <!-- Must start with `moduleId.` -->
-		<defaultValue></defaultValue>
-		<description> When uploading an XSN, this url is used as the "base path".  (Should be something like http://localhost:8080/openmrs)</description>
-	</globalProperty>
-	<globalProperty>
 		<property>pcslabinterface.queue_dir</property> <!-- Must start with `moduleId.` -->
 		<defaultValue>pcslabinterface/queue</defaultValue>
 		<description>
-			Directory containing the pcslabinterface queue items. This will contain xml files submitted by
-			infopath.  These items are awaiting processing to be turned into hl7 queue items
+			Directory containing the PCSLabInterface queue items. This will contain HL7 text files submitted by
+			LIMS.  These items are awaiting processing to be placed in the HL7 queue.
 		</description>
 	</globalProperty>
 	<globalProperty>
 		<property>pcslabinterface.queue_archive_dir</property> <!-- Must start with `moduleId.` -->
 		<defaultValue>pcslabinterface/archive/%Y/%M</defaultValue>
 		<description>
-			Directory containing the pcslabinterface archive items.  This will contain xml files that have
-			been submitted by infopath and then processed sucessfully into hl7.
+			Directory containing the PCSLabInterface archive items.  This will contain HL7 text files that have
+			been submitted by LIMS and then processed sucessfully into the HL7 queue.
 			Certain date parameters will be replaced with the current date:
 			%Y = four digit year
 			%M = two digit month
@@ -102,14 +97,6 @@
 	<messages>
 		<lang>en</lang>
 		<file>messages.properties</file>
-	</messages>
-	<messages>
-		<lang>fr</lang>
-		<file>messages_fr.properties</file>
-	</messages>
-	<messages>
-		<lang>es</lang>
-		<file>messages_es.properties</file>
 	</messages>
 	<!-- /Internationalization -->
 
