@@ -25,19 +25,16 @@ public class PcsLabInterfaceAdminExt extends AdministrationSectionExt {
 		return Extension.MEDIA_TYPE.html;
 	}
 
+	@Override
 	public String getTitle() {
 		return "pcslabinterface.title";
 	}
 
-	public String getRequiredPrivilege() {
-		return "Upload XSN,Manage PcsLabInterface";
-	}
-
+	@Override
 	public Map<String, String> getLinks() {
 		Map<String, String> map = new LinkedHashMap<String, String>();
 
-		map.put("module/pcslabinterface/pcsLabInterfaceInfo.htm",
-				"pcslabinterface.info");
+		map.put("module/pcslabinterface/pcsLabInterfaceInfo.htm", "pcslabinterface.info");
 
 		return map;
 	}
