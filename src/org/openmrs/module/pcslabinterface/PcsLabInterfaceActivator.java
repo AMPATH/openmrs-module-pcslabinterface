@@ -13,10 +13,8 @@
  */
 package org.openmrs.module.pcslabinterface;
 
-import java.util.Properties;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.Activator;
 
 public class PcsLabInterfaceActivator implements Activator {
@@ -28,13 +26,6 @@ public class PcsLabInterfaceActivator implements Activator {
 
 	public void startup() {
 		this.log.info("Starting the PcsLabInterface module");
-
-		Properties runtimeProperties = Context.getRuntimeProperties();
-
-		//PcsLabInterfaceConstants.PCSLABINTERFACE_CABEXTRACT_LOCATION = runtimeProperties
-		//		.getProperty("pcslabinterface.cabextract_location");
-		//PcsLabInterfaceConstants.PCSLABINTERFACE_LCAB_LOCATION = runtimeProperties
-		//		.getProperty("pcslabinterface.lcab_location");
 	}
 
 	public void shutdown() {
