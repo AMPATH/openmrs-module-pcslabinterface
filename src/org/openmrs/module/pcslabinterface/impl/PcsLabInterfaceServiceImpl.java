@@ -50,8 +50,7 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		return systemVariables;
 	}
 
-	public void createPcsLabInterfaceQueue(
-			PcsLabInterfaceQueue pcsLabInterfaceQueue)
+	public void createPcsLabInterfaceQueue(PcsLabInterfaceQueue pcsLabInterfaceQueue)
 			throws PcsLabInterfaceException {
 		User creator = Context.getAuthenticatedUser();
 		if (pcsLabInterfaceQueue.getDateCreated() == null) {
@@ -117,6 +116,12 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		}
 	}
 
+	/**
+	 * grabs the next file in the incoming queue (from the filesystem)
+	 *  
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#transformNextPcsLabInterfaceQueue()
+	 * @return PcsLabInterfaceQueue the next item in the queue
+	 */
 	public PcsLabInterfaceQueue getNextPcsLabInterfaceQueue() {
 		File queueDir = PcsLabInterfaceUtil.getQueueDir();
 
