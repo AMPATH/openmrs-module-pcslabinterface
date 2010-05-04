@@ -22,13 +22,15 @@ import java.util.List;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.Vector;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.User;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
+import org.openmrs.module.pcslabinterface.LabMessage;
+import org.openmrs.module.pcslabinterface.LabMessageArchive;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceException;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceQueue;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceService;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceUtil;
 import org.openmrs.util.OpenmrsUtil;
@@ -44,28 +46,28 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		TreeMap<String, String> systemVariables = new TreeMap<String, String>();
 		systemVariables.put("PCSLABINTERFACE_GP_QUEUE_DIR", PcsLabInterfaceUtil
 				.getQueueDir().getAbsolutePath());
-		systemVariables.put("PCSLABINTERFACE_GP_QUEUE_ARCHIVE_DIR", PcsLabInterfaceUtil
-				.getArchiveDir(null).getAbsolutePath());
+		systemVariables.put("PCSLABINTERFACE_GP_QUEUE_ARCHIVE_DIR",
+				PcsLabInterfaceUtil.getArchiveDir(null).getAbsolutePath());
 
 		return systemVariables;
 	}
 
-	public void createPcsLabInterfaceQueue(PcsLabInterfaceQueue pcsLabInterfaceQueue)
+	public void createLabMessage(LabMessage labMessage)
 			throws PcsLabInterfaceException {
 		User creator = Context.getAuthenticatedUser();
-		if (pcsLabInterfaceQueue.getDateCreated() == null) {
-			pcsLabInterfaceQueue.setDateCreated(new Date());
+		if (labMessage.getDateCreated() == null) {
+			labMessage.setDateCreated(new Date());
 		}
 		File queueDir = PcsLabInterfaceUtil.getQueueDir();
 
-		File outFile = OpenmrsUtil.getOutFile(queueDir, pcsLabInterfaceQueue
+		File outFile = OpenmrsUtil.getOutFile(queueDir, labMessage
 				.getDateCreated(), creator);
 
 		FileWriter writer = null;
 		try {
 			writer = new FileWriter(outFile);
 
-			writer.write(pcsLabInterfaceQueue.getFormData());
+			writer.write(labMessage.getData());
 		} catch (IOException io) {
 		} finally {
 			try {
@@ -76,38 +78,37 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		}
 	}
 
-	public Collection<PcsLabInterfaceQueue> getPcsLabInterfaceQueues() {
-		List<PcsLabInterfaceQueue> queues = new Vector<PcsLabInterfaceQueue>();
+	public Collection<LabMessage> getLabMessages() {
+		List<LabMessage> messages = new Vector<LabMessage>();
 
 		File queueDir = PcsLabInterfaceUtil.getQueueDir();
 
 		if (!(queueDir.exists())) {
 			this.log.warn("Unable to open queue directory: " + queueDir);
-			return queues;
+			return messages;
 		}
 
 		for (File file : queueDir.listFiles()) {
-			PcsLabInterfaceQueue queueItem = new PcsLabInterfaceQueue();
+			LabMessage queueItem = new LabMessage();
 			queueItem.setFileSystemUrl(file.getAbsolutePath());
 			queueItem.setDateCreated(new Date(file.lastModified()));
-			queues.add(queueItem);
+			messages.add(queueItem);
 		}
 
-		return queues;
+		return messages;
 	}
 
-	public void deletePcsLabInterfaceQueue(
-			PcsLabInterfaceQueue pcsLabInterfaceQueue) {
+	public void deleteLabMessage(LabMessage labMessage) {
 
-		if ((pcsLabInterfaceQueue == null)
-				|| (pcsLabInterfaceQueue.getFileSystemUrl() == null)) {
+		if ((labMessage == null) || (labMessage.getFileSystemUrl() == null)) {
 			throw new PcsLabInterfaceException(
-					"Unable to load pcsLabInterfaceQueue with empty file system url");
+					"Unable to load LabMessage with empty file system url");
 		}
-		File file = new File(pcsLabInterfaceQueue.getFileSystemUrl());
+		File file = new File(labMessage.getFileSystemUrl());
 		log.debug("file path is " + file.getAbsolutePath());
 		if (file.exists()) {
 			// TODO: move file to an archive, not delete it
+
 			if (!file.delete())
 				throw new PcsLabInterfaceException(
 						"Unable to delete file from queue: "
@@ -118,11 +119,11 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 
 	/**
 	 * grabs the next file in the incoming queue (from the filesystem)
-	 *  
-	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#transformNextPcsLabInterfaceQueue()
+	 * 
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#transformNextLabMessage()
 	 * @return PcsLabInterfaceQueue the next item in the queue
 	 */
-	public PcsLabInterfaceQueue getNextPcsLabInterfaceQueue() {
+	public LabMessage getNextLabMessage() {
 		File queueDir = PcsLabInterfaceUtil.getQueueDir();
 
 		File[] arr$ = queueDir.listFiles();
@@ -130,7 +131,7 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		int i$ = 0;
 		if (i$ < len$) {
 			File file = arr$[i$];
-			PcsLabInterfaceQueue queueItem = new PcsLabInterfaceQueue();
+			LabMessage queueItem = new LabMessage();
 			queueItem.setFileSystemUrl(file.getAbsolutePath());
 			queueItem.setDateCreated(new Date(file.lastModified()));
 			return queueItem;
@@ -139,13 +140,86 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		return null;
 	}
 
-	public Integer getPcsLabInterfaceQueueSize() {
+	public Integer getLabMessageQueueSize() {
 		File queueDir = PcsLabInterfaceUtil.getQueueDir();
 
 		return Integer.valueOf(queueDir.list().length);
 	}
 
+	/**
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceService#createLabMessageArchive(org.openmrs.module.pcslabinterface.LabMessageArchive)
+	 */
+	public void createLabMessageArchive(LabMessageArchive LabMessageArchive) {
+		User creator = Context.getAuthenticatedUser();
+
+		File queueDir = PcsLabInterfaceUtil.getArchiveDir(LabMessageArchive
+				.getDateCreated());
+
+		File outFile = PcsLabInterfaceUtil.getOutFile(queueDir,
+				LabMessageArchive.getDateCreated(), creator);
+
+		// write the queue's data to the file
+		try {
+			PcsLabInterfaceUtil.stringToFile(LabMessageArchive.getData(),
+					outFile);
+		} catch (IOException io) {
+			throw new PcsLabInterfaceException(
+					"Unable to save formentry archive", io);
+		}
+
+	}
+
+	/**
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceService#getLabMessageArchives()
+	 */
+	public Collection<LabMessageArchive> getLabMessageArchives() {
+		List<LabMessageArchive> archives = new Vector<LabMessageArchive>();
+
+		File archiveDir = PcsLabInterfaceUtil.getArchiveDir(null);
+
+		if (archiveDir.exists() == false) {
+			log.warn("Unable to open archive directory: " + archiveDir);
+			return archives;
+		}
+
+		// loop over all files in archive dir and create lazy archive items
+		for (File file : archiveDir.listFiles()) {
+			LabMessageArchive queueItem = new LabMessageArchive();
+			queueItem.setFileSystemUrl(file.getAbsolutePath());
+			queueItem.setDateCreated(new Date(file.lastModified()));
+			archives.add(queueItem);
+		}
+
+		return archives;
+	}
+
+	/**
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceService#deleteLabMessageArchive(org.openmrs.module.pcslabinterface.LabMessageArchive)
+	 */
+	public void deleteLabMessageArchive(LabMessageArchive LabMessageArchive) {
+		if (LabMessageArchive == null
+				|| LabMessageArchive.getFileSystemUrl() == null)
+			throw new PcsLabInterfaceException(
+					"Unable to load LabMessageArchive with empty file system url");
+
+		File file = new File(LabMessageArchive.getFileSystemUrl());
+
+		if (file.exists()) {
+			file.delete();
+		}
+	}
+
+	/**
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceService#getLabMessageArchiveSize()
+	 */
+	public Integer getLabMessageArchiveSize() {
+		File archiveDir = PcsLabInterfaceUtil.getArchiveDir(null);
+
+		return archiveDir.list().length;
+	}
+
 	public void garbageCollect() {
 		System.gc();
 	}
+
 }

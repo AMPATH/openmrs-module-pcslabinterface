@@ -15,6 +15,7 @@ package org.openmrs.module.pcslabinterface;
 
 import java.util.Collection;
 import java.util.SortedMap;
+
 import org.openmrs.annotation.Authorized;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,23 +25,60 @@ public abstract interface PcsLabInterfaceService {
 	public abstract SortedMap<String, String> getSystemVariables();
 
 	@Authorized(value = { "Add PcsLabInterface Queue", "PcsLabInterface" }, requireAll = true)
-	public abstract void createPcsLabInterfaceQueue(
-			PcsLabInterfaceQueue paramPcsLabInterfaceQueue);
+	public abstract void createLabMessage(LabMessage paramPcsLabInterfaceQueue);
 
 	@Authorized( { "Delete PcsLabInterface Queue" })
-	public abstract void deletePcsLabInterfaceQueue(
-			PcsLabInterfaceQueue paramPcsLabInterfaceQueue);
+	public abstract void deleteLabMessage(LabMessage paramPcsLabInterfaceQueue);
 
 	@Authorized( { "View PcsLabInterface Queue" })
-	public abstract Collection<PcsLabInterfaceQueue> getPcsLabInterfaceQueues();
-
-	@Transactional(readOnly = true)
-	@Authorized( { "View PcsLabInterface Queue" })
-	public abstract PcsLabInterfaceQueue getNextPcsLabInterfaceQueue();
+	public abstract Collection<LabMessage> getLabMessages();
 
 	@Transactional(readOnly = true)
 	@Authorized( { "View PcsLabInterface Queue" })
-	public abstract Integer getPcsLabInterfaceQueueSize();
+	public abstract LabMessage getNextLabMessage();
+
+	@Transactional(readOnly = true)
+	@Authorized( { "View PcsLabInterface Queue" })
+	public abstract Integer getLabMessageQueueSize();
 
 	public abstract void garbageCollect();
+
+	/**
+	 * Creates a file in
+	 * PcsLabInterfaceConstants.PCSLABINTERFACE_GP_QUEUE_ARCHIVE_DIR for the
+	 * data in this archive item
+	 * 
+	 * @param formEntryArchive
+	 *            object containing form data to save in the processing archive
+	 */
+	@Authorized( { PcsLabInterfaceConstants.PRIV_ADD_LAB_MESSAGE_ARCHIVE })
+	public void createLabMessageArchive(LabMessageArchive labMessageArchive);
+
+	/**
+	 * Get all lab message archive items
+	 * 
+	 * @return list of lab message archive items
+	 */
+	@Transactional(readOnly = true)
+	@Authorized( { PcsLabInterfaceConstants.PRIV_VIEW_LAB_MESSAGE_ARCHIVE })
+	public Collection<LabMessageArchive> getLabMessageArchives();
+
+	/**
+	 * Delete the given lab message archive from the system
+	 * 
+	 * @param LabMessageArchive
+	 *            to be deleted
+	 */
+	@Authorized( { PcsLabInterfaceConstants.PRIV_DELETE_LAB_MESSAGE_ARCHIVE })
+	public void deleteLabMessageArchive(LabMessageArchive labMessageArchive);
+
+	/**
+	 * Get the number of lab message archive items
+	 * 
+	 * @return integer number of archive items
+	 */
+	@Transactional(readOnly = true)
+	@Authorized( { PcsLabInterfaceConstants.PRIV_VIEW_LAB_MESSAGE_ERROR })
+	public Integer getLabMessageArchiveSize();
+
 }

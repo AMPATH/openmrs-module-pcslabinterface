@@ -41,7 +41,7 @@ public class PcsLabInterfaceQueueProcessorServlet extends HttpServlet {
 
 		ServletOutputStream out = response.getOutputStream();
 		try {
-			getPcsLabInterfaceQueueProcessor().processPcsLabInterfaceQueue();
+			getPcsLabInterfaceQueueProcessor().processLabMessageQueue();
 			out.print("PcsLabInterface queue processor has started");
 		} catch (APIException e) {
 			out

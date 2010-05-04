@@ -21,46 +21,46 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.User;
 import org.openmrs.util.OpenmrsUtil;
 
-public class PcsLabInterfaceQueue {
+public class LabMessage {
 	private Log log;
-	private int pcsLabInterfaceQueueId;
-	private String formData;
+	private int labMessageId;
+	private String data;
 	private User creator;
 	private Date dateCreated;
 	private String fileSystemUrl;
 
-	public PcsLabInterfaceQueue() {
+	public LabMessage() {
 		this.log = LogFactory.getLog(super.getClass());
 	}
 
-	public int getPcsLabInterfaceQueueId() {
-		return this.pcsLabInterfaceQueueId;
+	public int getLabMessageId() {
+		return this.labMessageId;
 	}
 
-	public void setPcsLabInterfaceQueueId(int pcsLabInterfaceQueueId) {
-		this.pcsLabInterfaceQueueId = pcsLabInterfaceQueueId;
+	public void setLabMessageId(int labMessageId) {
+		this.labMessageId = labMessageId;
 	}
 
-	public String getFormData() {
-		if ((this.formData == null) && (this.fileSystemUrl != null)) {
+	public String getData() {
+		if ((this.data == null) && (this.fileSystemUrl != null)) {
 			File file = new File(this.fileSystemUrl);
 
 			if (file.exists())
 				try {
-					this.formData = OpenmrsUtil.getFileAsString(file);
+					this.data = OpenmrsUtil.getFileAsString(file);
 				} catch (IOException io) {
-					this.log.warn("Unable to lazy load the formData from: "
+					this.log.warn("Unable to lazy load the data from: "
 							+ this.fileSystemUrl, io);
 					this.log
-							.warn("File system url does not exist for pcslabinterface queue item.  Url: '"
+							.warn("File system url does not exist for lab message item.  Url: '"
 									+ this.fileSystemUrl + "'");
 				}
 		}
-		return this.formData;
+		return this.data;
 	}
 
-	public void setFormData(String formData) {
-		this.formData = formData;
+	public void setData(String data) {
+		this.data = data;
 	}
 
 	public User getCreator() {

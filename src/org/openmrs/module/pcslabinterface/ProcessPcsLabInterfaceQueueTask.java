@@ -36,7 +36,7 @@ public class ProcessPcsLabInterfaceQueueTask extends AbstractTask {
 		try {
 			if (!(Context.isAuthenticated()))
 				authenticate();
-			this.processor.processPcsLabInterfaceQueue();
+			this.processor.processLabMessageQueue();
 		} catch (APIException e) {
 			throw e;
 		} finally {

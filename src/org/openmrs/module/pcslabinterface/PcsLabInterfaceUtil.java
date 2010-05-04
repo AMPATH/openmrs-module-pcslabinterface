@@ -16,10 +16,13 @@ package org.openmrs.module.pcslabinterface;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
 import org.openmrs.util.OpenmrsUtil;
@@ -42,10 +45,11 @@ public class PcsLabInterfaceUtil {
 	private static String archiveFileName = null;
 
 	/**
-     * Gets the directory where the user specified their queues were being stored
-     * 
-     * @return directory in which to find queued items
-     */
+	 * Gets the directory where the user specified their queues were being
+	 * stored
+	 * 
+	 * @return directory in which to find queued items
+	 */
 	public static File getQueueDir() {
 		if (queueDir == null) {
 			AdministrationService as = Context.getAdministrationService();
@@ -129,6 +133,57 @@ public class PcsLabInterfaceUtil {
 		str = str.replace("%W", weekmonthString);
 
 		return str;
+	}
+
+	/**
+	 * Gets an out File object. If date is not provided, the current timestamp
+	 * is used. If user is not provided, the user id is not put into the
+	 * filename. Assumes dir is already created
+	 * 
+	 * @param dir
+	 *            directory to make the random filename in
+	 * @param date
+	 *            optional Date object used for the name
+	 * @param user
+	 *            optional User creating this file object
+	 * @return file new file that is able to be written to
+	 */
+	public static File getOutFile(File dir, Date date, User user) {
+
+		File outFile;
+		do {
+			// format to print date in filename
+			DateFormat dateFormat = new SimpleDateFormat(
+					"yyyy.MM.dd-HHmm-ssSSS");
+
+			// use current date if none provided
+			if (date == null)
+				date = new Date();
+
+			StringBuilder filename = new StringBuilder();
+
+			// the start of the filename is the time so we can do some sorting
+			filename.append(dateFormat.format(date));
+
+			// insert the user id if they provided it
+			if (user != null) {
+				filename.append("-");
+				filename.append(user.getUserId());
+				filename.append("-");
+			}
+
+			// the end of the filename is a random number between 0 and 10000
+			filename.append((int) (Math.random() * 10000));
+			filename.append(".txt");
+
+			outFile = new File(dir, filename.toString());
+
+			// set to null to avoid very minimal possibility of an infinite loop
+			date = null;
+
+		} while (outFile.exists());
+
+		return outFile;
 	}
 
 	public static void stringToFile(String fileContents, File outFile)
