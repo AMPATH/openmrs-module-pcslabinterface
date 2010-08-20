@@ -14,6 +14,7 @@
 package org.openmrs.module.pcslabinterface;
 
 import org.openmrs.module.pcslabinterface.rules.RemoveCommasFromHIVViralLoads;
+import org.openmrs.module.pcslabinterface.rules.RemoveValueModifiersFromHIVViralLoads;
 import org.openmrs.module.pcslabinterface.rules.TransformRule;
 
 public class PcsLabInterfaceConstants {
@@ -33,7 +34,8 @@ public class PcsLabInterfaceConstants {
 	public static final TransformRule[] TRANSFORM_RULES() {
 		if (rules == null)
 			rules = new TransformRule[] {
-					new RemoveCommasFromHIVViralLoads()
+					new RemoveCommasFromHIVViralLoads(),
+					new RemoveValueModifiersFromHIVViralLoads()
 			};
 		return rules;
 	};

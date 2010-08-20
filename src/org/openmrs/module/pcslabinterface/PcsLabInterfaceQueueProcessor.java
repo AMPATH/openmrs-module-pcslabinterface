@@ -24,7 +24,6 @@ import org.openmrs.api.APIException;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7InQueue;
 import org.openmrs.module.pcslabinterface.rules.TransformRule;
-import org.openmrs.util.OpenmrsUtil;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
@@ -85,6 +84,7 @@ public class PcsLabInterfaceQueueProcessor {
 	 * @param data the message to be processed
 	 * @return results of processing the message
 	 * @should remove commas from HIV Viral Loads
+	 * @should correct values with modifiers from HIV Viral Loads
 	 */
 	protected String preProcessMessage(String data) {
 		// TODO '\r' happens to be the character between lines at this time, but
