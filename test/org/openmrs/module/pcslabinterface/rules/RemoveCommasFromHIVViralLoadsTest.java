@@ -2,6 +2,8 @@ package org.openmrs.module.pcslabinterface.rules;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.api.context.Context;
+import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.openmrs.test.Verifies;
 
 public class RemoveCommasFromHIVViralLoadsTest {
@@ -15,7 +17,9 @@ public class RemoveCommasFromHIVViralLoadsTest {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||123,456|||||||||20080206";
 
 		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||123456|||||||||20080206\r"
-				+ "NTE|||PCSLabInterface modified value; original was: 123,456";
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ "123,456";
 
 		Assert.assertEquals(expected,
 				new RemoveCommasFromHIVViralLoads().transform(hl7string));
@@ -31,7 +35,9 @@ public class RemoveCommasFromHIVViralLoadsTest {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||123,456,789|||||||||20080206";
 
 		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||123456789|||||||||20080206\r"
-				+ "NTE|||PCSLabInterface modified value; original was: 123,456,789";
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ "123,456,789";
 
 		Assert.assertEquals(expected,
 				new RemoveCommasFromHIVViralLoads().transform(hl7string));

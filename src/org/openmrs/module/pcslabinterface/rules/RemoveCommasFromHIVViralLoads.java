@@ -3,6 +3,7 @@ package org.openmrs.module.pcslabinterface.rules;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.springframework.util.StringUtils;
 
 /**
@@ -15,18 +16,22 @@ import org.springframework.util.StringUtils;
 public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
-	private Pattern valuePattern = Pattern.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([0123456789,]+)\\|.*");
-	
+	private Pattern valuePattern = Pattern
+			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([0123456789,]+)\\|.*");
+
 	/**
-	 * initializes the regex pattern for matching on a specific concept 
+	 * initializes the regex pattern for matching on a specific concept
 	 * 
-	 * @should match only numeric OBX segments for HIV Viral Load with commas in the value
+	 * @should match only numeric OBX segments for HIV Viral Load with commas in
+	 *         the value
 	 */
 	public RemoveCommasFromHIVViralLoads() {
-		// the follow regex ensures that the concept is HIV Viral Load and the value has at least one comma in it
-		super("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[^,\\|]*,.*");
+		// the follow regex ensures that the concept is HIV Viral Load and the
+		// value has at least one comma in it
+		super(
+				"OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[^,\\|]*,.*");
 	}
-	
+
 	/**
 	 * transforms the test string by stripping commas from the value and
 	 * appending a comment (NTE segment) with the original value
@@ -43,10 +48,10 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 
 		// yank the value from the test string
 		String value = m.group(1);
-		
+
 		// remove the commas
 		String newValue = StringUtils.deleteAny(value, ",");
-		
+
 		// test to see if newValue really is an Integer
 		try {
 			Integer.valueOf(newValue);
@@ -54,10 +59,13 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 			return test;
 		}
 
-		// replace first occurrence of value with newValue 
+		// replace first occurrence of value with newValue
 		test = test.replaceFirst(value, newValue);
 
 		// append a comment describing the change
-		return test.concat("\rNTE|||PCSLabInterface modified value; original was: ").concat(value);
+		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
+				.concat("NTE|||")
+				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
+				.concat(value);
 	}
 }

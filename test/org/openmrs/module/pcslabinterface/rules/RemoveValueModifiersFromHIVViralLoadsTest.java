@@ -1,8 +1,8 @@
 package org.openmrs.module.pcslabinterface.rules;
 
-
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.openmrs.test.Verifies;
 
 public class RemoveValueModifiersFromHIVViralLoadsTest {
@@ -34,10 +34,13 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||<400|||||||||20080206";
 
 		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||399|||||||||20080206\r"
-				+ "NTE|||PCSLabInterface modified value; original was: <400";
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ "<400";
 
 		Assert.assertEquals(expected,
-				new RemoveValueModifiersFromHIVViralLoads().transform(hl7string));
+				new RemoveValueModifiersFromHIVViralLoads()
+						.transform(hl7string));
 	}
 
 	/**
@@ -50,9 +53,12 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>750000|||||||||20080206";
 
 		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||750001|||||||||20080206\r"
-				+ "NTE|||PCSLabInterface modified value; original was: >750000";
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ ">750000";
 
 		Assert.assertEquals(expected,
-				new RemoveValueModifiersFromHIVViralLoads().transform(hl7string));
+				new RemoveValueModifiersFromHIVViralLoads()
+						.transform(hl7string));
 	}
 }

@@ -29,6 +29,9 @@ public class PcsLabInterfaceConstants {
 	public static final String PRIV_DELETE_LAB_MESSAGE_ARCHIVE = "Delete PcsLabInterface Message Archive";
 	public static final String PRIV_VIEW_LAB_MESSAGE_ERROR = "View PcsLabInterface Message Error";
 
+	public static final String LAB_VALUE_MODIFIED = "PCS Value: ";
+	public static final String MESSAGE_EOL_SEQUENCE = "\r";
+	
 	private static TransformRule[] rules = null;
 	
 	public static final TransformRule[] TRANSFORM_RULES() {

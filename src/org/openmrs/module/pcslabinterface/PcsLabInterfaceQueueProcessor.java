@@ -90,7 +90,7 @@ public class PcsLabInterfaceQueueProcessor {
 		// TODO '\r' happens to be the character between lines at this time, but
 		// this may not always be the case. we should make this more flexible to
 		// recognize line endings
-		String[] lines = data.split("\r");
+		String[] lines = data.split(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
 		List<String> results = new ArrayList<String>();
 
 		// loop through lines of the HL7
@@ -123,7 +123,7 @@ public class PcsLabInterfaceQueueProcessor {
 			log.debug("PcsLabInterfaceService not found");
 			return false;
 		}
-		LabMessage labMessage;
+		LabMessage labMessage; 
 		if ((labMessage = pcsService.getNextLabMessage()) != null) {
 			parseLabMessage(labMessage);
 			transformOccurred = true;
@@ -136,7 +136,7 @@ public class PcsLabInterfaceQueueProcessor {
 	 * 
 	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueTask#execute()
 	 * @throws APIException
-	 */
+	 */ 
 	public void processLabMessageQueue() throws APIException {
 		synchronized (isRunning) {
 			if (isRunning.booleanValue()) {
