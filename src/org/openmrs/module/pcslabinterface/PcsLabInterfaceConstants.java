@@ -13,6 +13,9 @@
  */
 package org.openmrs.module.pcslabinterface;
 
+import org.openmrs.module.pcslabinterface.rules.RemoveCommasFromHIVViralLoads;
+import org.openmrs.module.pcslabinterface.rules.TransformRule;
+
 public class PcsLabInterfaceConstants {
 
 	public static final String PCSLABINTERFACE_GP_QUEUE_DIR = "pcslabinterface.queue_dir";
@@ -24,5 +27,15 @@ public class PcsLabInterfaceConstants {
 	public static final String PRIV_VIEW_LAB_MESSAGE_ARCHIVE = "View PcsLabInterface Message Archive";
 	public static final String PRIV_DELETE_LAB_MESSAGE_ARCHIVE = "Delete PcsLabInterface Message Archive";
 	public static final String PRIV_VIEW_LAB_MESSAGE_ERROR = "View PcsLabInterface Message Error";
+
+	private static TransformRule[] rules = null;
+	
+	public static final TransformRule[] TRANSFORM_RULES() {
+		if (rules == null)
+			rules = new TransformRule[] {
+					new RemoveCommasFromHIVViralLoads()
+			};
+		return rules;
+	};
 
 }

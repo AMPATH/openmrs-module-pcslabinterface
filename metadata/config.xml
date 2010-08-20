@@ -6,9 +6,9 @@
 	<!-- Base Module Properties -->
 	<id>pcslabinterface</id>
 	<name>PcsLabInterface</name>
-	<version>0.2</version>
+	<version>0.3</version>
 	<package>org.openmrs.module.pcslabinterface</package>
-	<author>Ben Wolfe, Jeremy Keiper</author>
+	<author>BeJeremy Keiper</author>
 	<description>
 			OpenMRS PcsLabInterface
 	</description>

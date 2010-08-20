@@ -2,6 +2,7 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="web/src"/>
+	<classpathentry kind="src" path="test"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="lib" path="lib-common/commons-logging-1.0.4.jar"/>
 	<classpathentry kind="lib" path="metadata"/>
@@ -11,5 +12,7 @@
 	<classpathentry kind="lib" path="lib-common/openmrs-api-1.6.0.12108-beta.jar" sourcepath="/openmrs-trunk"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.6.0.12108-beta.jar"/>
 	<classpathentry kind="lib" path="lib-common/simple-xml-2.2.4.jar"/>
+	<classpathentry kind="lib" path="lib-common/junit-4.8.1.jar"/>
+	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.6.1.13880-.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
