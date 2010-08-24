@@ -17,13 +17,13 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([0123456789,]+)\\|.*");
+			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([^,\\|]*,[^\\|]*)\\|.*");
 
 	/**
 	 * initializes the regex pattern for matching on a specific concept
 	 * 
-	 * @should match only numeric OBX segments for HIV Viral Load with commas in
-	 *         the value
+	 * @should match only numeric OBX segments for HIV Viral Load with commas in the value
+	 * @should match values with other characters as long as there is at least one comma
 	 */
 	public RemoveCommasFromHIVViralLoads() {
 		// the follow regex ensures that the concept is HIV Viral Load and the
@@ -51,13 +51,6 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 
 		// remove the commas
 		String newValue = StringUtils.deleteAny(value, ",");
-
-		// test to see if newValue really is an Integer
-		try {
-			Integer.valueOf(newValue);
-		} catch (NumberFormatException e) {
-			return test;
-		}
 
 		// replace first occurrence of value with newValue
 		test = test.replaceFirst(value, newValue);

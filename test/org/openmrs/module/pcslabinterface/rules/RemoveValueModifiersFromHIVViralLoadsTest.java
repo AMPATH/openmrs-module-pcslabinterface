@@ -25,6 +25,18 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 	}
 
 	/**
+	 * @see {@link RemoveValueModifiersFromHIVViralLoads#RemoveValueModifiersFromHIVViralLoads()}
+	 */
+	@Test
+	@Verifies(value = "should match strings with breaks in them", method = "RemoveValueModifiersFromHIVViralLoads()")
+	public void RemoveValueModifiersFromHIVViralLoads_shouldMatchStringsWithBreaksInThem()
+			throws Exception {
+		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>123456789|||||||||20080206\rNTE|||Hey now";
+		Assert.assertEquals(true,
+				new RemoveValueModifiersFromHIVViralLoads().matches(hl7string));
+	}
+
+	/**
 	 * @see {@link RemoveValueModifiersFromHIVViralLoads#transform(String)}
 	 */
 	@Test
@@ -61,4 +73,5 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 				new RemoveValueModifiersFromHIVViralLoads()
 						.transform(hl7string));
 	}
+
 }

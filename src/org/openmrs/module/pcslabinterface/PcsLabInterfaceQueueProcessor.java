@@ -85,26 +85,32 @@ public class PcsLabInterfaceQueueProcessor {
 	 * @return results of processing the message
 	 * @should remove commas from HIV Viral Loads
 	 * @should correct values with modifiers from HIV Viral Loads
+	 * @should process values with both commas and modifiers from HIV Viral
+	 *         Loads
 	 */
 	protected String preProcessMessage(String data) {
 		// TODO '\r' happens to be the character between lines at this time, but
 		// this may not always be the case. we should make this more flexible to
 		// recognize line endings
-		String[] lines = data.split(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
+		String[] lines = data
+				.split(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
 		List<String> results = new ArrayList<String>();
 
 		// loop through lines of the HL7
 		for (String line : lines) {
 			// loop through transform rules
-			for (TransformRule rule : PcsLabInterfaceConstants.TRANSFORM_RULES())
+			for (TransformRule rule : PcsLabInterfaceConstants
+					.TRANSFORM_RULES())
 				if (rule.matches(line))
-					 // TODO perhaps expect a list back from transform() so we can addAll() results
-					 line = rule.transform(line);
+					// TODO perhaps expect a list back from transform() so we
+					// can addAll() results
+					line = rule.transform(line);
 			// append the line to the results
 			results.add(line);
 		}
 
-		return StringUtils.collectionToDelimitedString(results, "\r");
+		return StringUtils.collectionToDelimitedString(results,
+				PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
 	}
 
 	/**
@@ -123,7 +129,7 @@ public class PcsLabInterfaceQueueProcessor {
 			log.debug("PcsLabInterfaceService not found");
 			return false;
 		}
-		LabMessage labMessage; 
+		LabMessage labMessage;
 		if ((labMessage = pcsService.getNextLabMessage()) != null) {
 			parseLabMessage(labMessage);
 			transformOccurred = true;
@@ -136,7 +142,7 @@ public class PcsLabInterfaceQueueProcessor {
 	 * 
 	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueTask#execute()
 	 * @throws APIException
-	 */ 
+	 */
 	public void processLabMessageQueue() throws APIException {
 		synchronized (isRunning) {
 			if (isRunning.booleanValue()) {

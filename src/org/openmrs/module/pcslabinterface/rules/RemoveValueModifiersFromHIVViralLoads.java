@@ -15,20 +15,23 @@ import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
-	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|.*");
+	private static final Pattern valuePattern = Pattern
+			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
 
+	// this regex describes a simple comment pattern
+	private static final Pattern commentPattern = Pattern.compile("\\rNTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
+	
 	/**
 	 * initializes the regex pattern for matching on a specific concept
 	 * 
-	 * @should match only numeric OBX segments for HIV Viral Load with a
-	 *         modifier before the value
+	 * @should match only numeric OBX segments for HIV Viral Load with a modifier before the value
+	 * @should match strings with breaks in them
 	 */
 	public RemoveValueModifiersFromHIVViralLoads() {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|.*");
+				"OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
 	}
 
 	/**
@@ -42,7 +45,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 	public String transform(String test) {
 		// check to make sure the value is what we expect
 		Matcher m = valuePattern.matcher(test);
-		if (!m.matches())
+		if (!m.lookingAt())
 			return test;
 
 		// yank the value from the test string
@@ -72,6 +75,10 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 		// replace first occurrence of value with newValue
 		test = test.replaceFirst(modifier + value, newValue.toString());
 
+		// no need to comment if one already exists
+		if (commentPattern.matcher(test).find())
+			return test;
+		
 		// append a comment describing the change
 		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
 				.concat("NTE|||")

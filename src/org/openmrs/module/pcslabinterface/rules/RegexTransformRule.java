@@ -43,11 +43,13 @@ abstract public class RegexTransformRule implements TransformRule {
 	}
 
 	/**
+	 * Guarantees that the regex pattern for this rule can be found within the test string
+	 * 
 	 * @see org.openmrs.module.pcslabinterface.rules.TransformRule#matches(java.lang.String)
 	 */
 	public boolean matches(String test) {
 		if (getRegex() != null)
-			return getRegex().matcher(test).matches();
+			return getRegex().matcher(test).find();
 		return false;
 	}
 
