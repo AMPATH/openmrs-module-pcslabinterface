@@ -31,6 +31,7 @@ public class PcsLabInterfaceConstants {
 
 	public static final String LAB_VALUE_MODIFIED = "PCS Value: ";
 	public static final String MESSAGE_EOL_SEQUENCE = "\r";
+	public static final String MODULE_ID = "pcslabinterface";
 	
 	private static TransformRule[] rules = null;
 	

@@ -6,11 +6,12 @@
 	<!-- Base Module Properties -->
 	<id>pcslabinterface</id>
 	<name>PcsLabInterface</name>
-	<version>0.3</version>
+	<version>0.4</version>
 	<package>org.openmrs.module.pcslabinterface</package>
-	<author>BeJeremy Keiper</author>
+	<author>Jeremy Keiper</author>
 	<description>
-			OpenMRS PcsLabInterface
+			Interface to PCSLabPlus LIMS system, includes a preprocessor for HL7 messages
+			coming in as text files and a REST Module pass-through for patient lookup
 	</description>
 	<activator>org.openmrs.module.pcslabinterface.PcsLabInterfaceActivator</activator>
 
@@ -18,6 +19,10 @@
 	<!-- /Base Module Properties -->
 	
 	<require_version>1.3.1</require_version>
+
+	<require_modules>
+		<require_module version="1.4.3">org.openmrs.module.restmodule</require_module>
+	</require_modules>
 	
 	<!-- Extensions -->
 	<extension>
@@ -83,10 +88,18 @@
 
 	<!-- Servlets -->
 	<!-- Accessed through the url /pageContext()/moduleServlet/<moduleId>/<servlet-name> -->
+	<servlet>
+		<servlet-name>pcsapi</servlet-name>
+		<servlet-class>@MODULE_PACKAGE@.web.PCSRestServlet</servlet-class>
+	</servlet>
+	<servlet>
+		<servlet-name>pcsjson</servlet-name>
+		<servlet-class>@MODULE_PACKAGE@.web.PCSRestServlet</servlet-class>
+	</servlet>
 	<!-- #### TEMPORARY ACCESS TO QUEUE PROCESSING SERVLETS (Burke 3/18/2006) #### -->
 	<servlet>
 		<servlet-name>pcsLabInterfaceQueueProcessor</servlet-name>
-		<servlet-class>org.openmrs.module.pcslabinterface.web.PcsLabInterfaceQueueProcessorServlet</servlet-class>
+		<servlet-class>@MODULE_PACKAGE@.web.PcsLabInterfaceQueueProcessorServlet</servlet-class>
 	</servlet>
 	<!-- #### TEMPORARY ACCESS TO QUEUE PROCESSING SERVLETS (Burke 3/18/2006) #### -->
 	<!-- /Servlets -->

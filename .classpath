@@ -14,5 +14,6 @@
 	<classpathentry kind="lib" path="lib-common/openmrs-api-1.6.2.15027-dev.jar"/>
 	<classpathentry kind="lib" path="lib-common/tests-openmrs-api-1.6.2.15027-dev.jar"/>
 	<classpathentry kind="lib" path="lib-common/web-openmrs-api-1.6.2.15027-dev.jar"/>
+	<classpathentry kind="lib" path="lib-common/restmodule-1.4.4.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
