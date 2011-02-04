@@ -3,10 +3,10 @@
 <module configVersion="1.0">
 	
 	<!-- Base Module Properties -->
-	<id>pcslabinterface</id>
-	<name>PcsLabInterface</name>
-	<version>0.4</version>
-	<package>org.openmrs.module.pcslabinterface</package>
+	<id>@MODULE_ID@</id>
+	<name>@MODULE_NAME@</name>
+	<version>@MODULE_VERSION@</version>
+	<package>@MODULE_PACKAGE@</package>
 	<author>Jeremy Keiper</author>
 	<description>
 			Interface to PCSLabPlus LIMS system, includes a preprocessor for HL7 messages
@@ -37,23 +37,23 @@
 	
 	<!-- Required Privileges -->
 	<privilege>
-		<name>PcsLabInterface</name>
+		<name>@MODULE_NAME@</name>
 		<description>Allows user to access PCSLabInterface pages/functions</description>
 	</privilege>
 	<privilege>
-		<name>Add PcsLabInterfaceQueue</name>
+		<name>@MODULE_NAME@</name>
 		<description>Allows user to add a queue item to database</description>
 	</privilege>
 	<privilege>
-		<name>View PcsLabInterfaceQueue</name>
+		<name>@MODULE_NAME@</name>
 		<description>Allows user to view the queue items</description>
 	</privilege>
 	<privilege>
-		<name>Edit PcsLabInterfaceQueue</name>
+		<name>@MODULE_NAME@</name>
 		<description>Allows the user to edit the PCSLabInterface queue</description>
 	</privilege>
 	<privilege>
-		<name>Delete PcsLabInterfaceQueue</name>
+		<name>@MODULE_NAME@</name>
 		<description>Allows the user to delete PCSLabInterface queue items</description>
 	</privilege>
 	<!-- /Required Privileges -->
