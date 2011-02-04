@@ -13,12 +13,14 @@ import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.openmrs.module.restmodule.RestUtil;
 import org.openmrs.module.restmodule.web.FindPatientResource;
+import org.openmrs.module.restmodule.web.FindUserResource;
 import org.openmrs.module.restmodule.web.HL7MessageResource;
 import org.openmrs.module.restmodule.web.ObsResource;
 import org.openmrs.module.restmodule.web.PatientResource;
 import org.openmrs.module.restmodule.web.RestResource;
 import org.openmrs.module.restmodule.web.RestResource.Operation;
 import org.openmrs.module.restmodule.web.RestResource.OutputType;
+import org.openmrs.module.restmodule.web.UserResource;
 
 /**
  * This is a direct copy of the REST Module's RestServlet
@@ -45,6 +47,8 @@ public class PCSRestServlet extends HttpServlet {
 	static {
 		resources.put("patient", new PatientResource());
 		resources.put("findPatient", new FindPatientResource());
+		resources.put("user", new UserResource());
+		resources.put("findUser", new FindUserResource());
 		resources.put("obs", new ObsResource());
 		resources.put("hl7", new HL7MessageResource());
 	}

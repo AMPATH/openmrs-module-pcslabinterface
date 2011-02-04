@@ -5,6 +5,16 @@
   
 <beans>
 	
+	<!-- HL7 Handler override
+	<bean class="org.openmrs.hl7.impl.HL7ServiceImpl" factory-method="getInstance">
+		<property name="HL7Handlers">
+			<map>
+				<entry key="ORU_R01"><bean class="org.openmrs.module.pcslabinterface.LabORUR01Handler"/></entry>
+			</map>
+		</property>
+	</bean>
+	 -->
+	
     <bean id="pcsLabInterfaceUrlMapping" class="org.springframework.web.servlet.handler.SimpleUrlHandlerMapping">
     	<property name="order"><value>4</value></property>
     	<property name="mappings">
