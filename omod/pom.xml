@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>pcslabinterface</artifactId>
-		<version>0.4-SNAPSHOT</version>
+		<version>0.4</version>
 	</parent>
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>pcslabinterface-omod</artifactId>
@@ -18,7 +18,12 @@
 			<artifactId>pcslabinterface-api</artifactId>
 			<version>${project.parent.version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>org.openmrs.module</groupId>
+			<artifactId>rest</artifactId>
+			<version>1.4.4.2</version>
+			<type>jar</type>
+		</dependency>
 		<dependency>
 			<groupId>org.openmrs.api</groupId>
 			<artifactId>openmrs-api</artifactId>
