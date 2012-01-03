@@ -46,11 +46,16 @@ public class RemoveCommasFromHIVViralLoadsTest {
 	 * @see {@link RemoveCommasFromHIVViralLoads#RemoveCommasFromHIVViralLoads()}
 	 */
 	@Test
-	@Verifies(value = "should match only numeric OBX segments for HIV Viral Load with commas in the value", method = "RemoveCommasFromHIVViralLoads()")
-	public void RemoveCommasFromHIVViralLoads_shouldMatchOnlyNumericOBXSegmentsForHIVViralLoadWithCommasInTheValue()
+	@Verifies(value = "should match numeric and structured text OBX segments for HIV Viral Load with commas in the value", method = "RemoveCommasFromHIVViralLoads()")
+	public void RemoveCommasFromHIVViralLoads_shouldMatchNumericAndStructuredTextOBXSegmentsForHIVViralLoadWithCommasInTheValue()
 			throws Exception {
 		// with commas
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||123,456,789|||||||||20080206";
+		Assert.assertEquals(true,
+				new RemoveCommasFromHIVViralLoads().matches(hl7string));
+
+        // with ST instead of NM
+		hl7string = "OBX|1|ST|856^HIV Viral Load^99DCT||123,456,789|||||||||20080206";
 		Assert.assertEquals(true,
 				new RemoveCommasFromHIVViralLoads().matches(hl7string));
 

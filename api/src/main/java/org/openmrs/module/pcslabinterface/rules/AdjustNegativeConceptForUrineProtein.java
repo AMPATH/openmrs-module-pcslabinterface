@@ -4,7 +4,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
-import org.springframework.util.StringUtils;
 
 /**
  * Several numeric values for HIV Viral Load are simply digits with commas in
@@ -13,31 +12,31 @@ import org.springframework.util.StringUtils;
  * 
  * @author jkeiper
  */
-public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
+public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([^,\\|]*,[^\\|]*)\\|.*");
+			.compile("OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|(\\^NEGATIVE\\^99DCT)\\|.*");
 
 	/**
 	 * initializes the regex pattern for matching on a specific concept
 	 * 
-	 * @should match numeric and structured text OBX segments for HIV Viral Load with commas in the value
+	 * @should match only numeric OBX segments for HIV Viral Load with commas in the value
 	 * @should match values with other characters as long as there is at least one comma
 	 */
-	public RemoveCommasFromHIVViralLoads() {
+	public AdjustNegativeConceptForUrineProtein() {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[^,\\|]*,.*");
+				"OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|\\^NEGATIVE\\^99DCT.*");
 	}
 
 	/**
 	 * transforms the test string by stripping commas from the value and
 	 * appending a comment (NTE segment) with the original value
 	 * 
-	 * @should remove commas from the original value
-	 * @should add a comment containing the original value
+	 * @should replace improper concept reference
+	 * @should not replace proper concept reference
 	 */
 	@Override
 	public String transform(String test) {
@@ -46,19 +45,13 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 		if (!m.matches())
 			return test;
 
-		// yank the value from the test string
-		String value = m.group(1);
-
-		// remove the commas
-		String newValue = StringUtils.deleteAny(value, ",");
-
 		// replace first occurrence of value with newValue
-		test = test.replaceFirst(value, newValue);
+		test = test.replaceFirst("\\^NEGATIVE\\^99DCT", "664^NEGATIVE^99DCT");
 
 		// append a comment describing the change
 		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
 				.concat("NTE|||")
 				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
-				.concat(value);
+				.concat("^NEGATIVE^99DCT");
 	}
 }

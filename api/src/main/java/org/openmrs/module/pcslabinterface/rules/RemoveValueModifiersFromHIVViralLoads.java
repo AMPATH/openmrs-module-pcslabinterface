@@ -16,7 +16,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private static final Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
+			.compile("OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
 
 	// this regex describes a simple comment pattern
 	private static final Pattern commentPattern = Pattern.compile("\\rNTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
@@ -31,7 +31,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|NM\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
+				"OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
 	}
 
 	/**

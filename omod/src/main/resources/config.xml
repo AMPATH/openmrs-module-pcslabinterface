@@ -12,7 +12,7 @@
 			Interface to PCSLabPlus LIMS system, includes a preprocessor for HL7 messages
 			coming in as text files and a REST Module pass-through for patient lookup
 	</description>
-	<activator>org.openmrs.module.pcslabinterface.PcsLabInterfaceActivator</activator>
+	<activator>org.openmrs.module.pcslabinterface.web.PcsLabInterfaceActivator</activator>
 
 	<updateURL>https://dev.openmrs.org/modules/download/pcslabinterface/update.rdf</updateURL>
 	<!-- /Base Module Properties -->
@@ -26,7 +26,7 @@
 	<!-- Extensions -->
 	<extension>
 		<point>org.openmrs.admin.list</point>
-		<class>org.openmrs.module.pcslabinterface.extension.html.PcsLabInterfaceAdminExt</class>
+		<class>org.openmrs.module.pcslabinterface.web.extension.PcsLabInterfaceAdminExt</class>
 	</extension>
 	<!-- /Extensions -->
 	

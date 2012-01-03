@@ -25,7 +25,7 @@
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
 						<bean class="org.openmrs.module.pcslabinterface.impl.PcsLabInterfaceServiceImpl">
-						</bean>
+                        </bean>
 					</property>
 					<property name="preInterceptors">
 						<list>
