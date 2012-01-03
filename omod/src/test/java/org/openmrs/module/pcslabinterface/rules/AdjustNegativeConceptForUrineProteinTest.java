@@ -14,12 +14,12 @@ public class AdjustNegativeConceptForUrineProteinTest {
 	@Verifies(value = "should replace improper concept reference", method = "transform(String)")
 	public void transform_shouldReplaceImproperConceptReference()
 			throws Exception {
-		String hl7string = "OBX|1|CWE|2339^URINE Protein^99DCT||^NEGATIVE^99DCT|||||||||20080206";
+		String hl7string = "OBX|1|CWE|2339^URINE Protein^99DCT||^Negative^99DCT|||||||||20080206";
 
 		String expected = "OBX|1|CWE|2339^URINE Protein^99DCT||664^NEGATIVE^99DCT|||||||||20080206\r"
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
-				+ "^NEGATIVE^99DCT";
+				+ "^Negative^99DCT";
 
         String actual = new AdjustNegativeConceptForUrineProtein().transform(hl7string);
 

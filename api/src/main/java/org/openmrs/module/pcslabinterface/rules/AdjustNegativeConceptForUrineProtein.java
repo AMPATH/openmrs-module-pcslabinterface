@@ -16,7 +16,7 @@ public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|(\\^NEGATIVE\\^99DCT)\\|.*");
+			.compile("OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|(\\^Negative\\^99DCT)\\|.*");
 
 	/**
 	 * initializes the regex pattern for matching on a specific concept
@@ -28,7 +28,7 @@ public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|\\^NEGATIVE\\^99DCT.*");
+				"OBX\\|\\d*\\|CWE\\|2339\\^URINE Protein\\^99DCT\\|[^\\|]*\\|\\^Negative\\^99DCT.*");
 	}
 
 	/**
@@ -37,6 +37,7 @@ public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 	 * 
 	 * @should replace improper concept reference
 	 * @should not replace proper concept reference
+	 * @should replace 
 	 */
 	@Override
 	public String transform(String test) {
@@ -46,12 +47,12 @@ public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 			return test;
 
 		// replace first occurrence of value with newValue
-		test = test.replaceFirst("\\^NEGATIVE\\^99DCT", "664^NEGATIVE^99DCT");
+		test = test.replaceFirst("\\^Negative\\^99DCT", "664^NEGATIVE^99DCT");
 
 		// append a comment describing the change
 		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
 				.concat("NTE|||")
 				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
-				.concat("^NEGATIVE^99DCT");
+				.concat("^Negative^99DCT");
 	}
 }
