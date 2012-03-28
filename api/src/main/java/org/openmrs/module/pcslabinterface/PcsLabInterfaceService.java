@@ -82,6 +82,7 @@ public abstract interface PcsLabInterfaceService {
 	@Authorized( { PcsLabInterfaceConstants.PRIV_VIEW_LAB_MESSAGE_ERROR })
 	public Integer getLabMessageArchiveSize();
 
+	@Transactional(readOnly = true)
 	public List<Integer> getNumericConceptIds();
 
 }
