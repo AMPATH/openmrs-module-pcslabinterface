@@ -13,10 +13,7 @@
  */
 package org.openmrs.module.pcslabinterface;
 
-import org.openmrs.module.pcslabinterface.rules.AdjustNegativeConceptForUrineProtein;
-import org.openmrs.module.pcslabinterface.rules.RemoveCommasFromHIVViralLoads;
-import org.openmrs.module.pcslabinterface.rules.RemoveValueModifiersFromHIVViralLoads;
-import org.openmrs.module.pcslabinterface.rules.TransformRule;
+import org.openmrs.module.pcslabinterface.rules.*;
 
 public class PcsLabInterfaceConstants {
 
@@ -31,6 +28,7 @@ public class PcsLabInterfaceConstants {
 	public static final String PRIV_VIEW_LAB_MESSAGE_ERROR = "View PcsLabInterface Message Error";
 
 	public static final String LAB_VALUE_MODIFIED = "PCS Value: ";
+	public static final String ST_TO_NM = "originally ST datatype";
 	public static final String MESSAGE_EOL_SEQUENCE = "\r";
 	public static final String MODULE_ID = "pcslabinterface";
 
@@ -39,6 +37,7 @@ public class PcsLabInterfaceConstants {
 	public static final TransformRule[] TRANSFORM_RULES() {
 		if (rules == null)
 			rules = new TransformRule[] {
+					new ChangeDatatypeForNumericObservations(),
 					new RemoveCommasFromHIVViralLoads(),
 					new RemoveValueModifiersFromHIVViralLoads(),
                     new AdjustNegativeConceptForUrineProtein()

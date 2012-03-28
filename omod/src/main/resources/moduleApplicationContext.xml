@@ -25,6 +25,11 @@
 					<property name="transactionManager"><ref bean="transactionManager"/></property>
 					<property name="target">
 						<bean class="org.openmrs.module.pcslabinterface.impl.PcsLabInterfaceServiceImpl">
+							<property name="dao">
+								<bean class="org.openmrs.module.pcslabinterface.db.HibernatePcsLabInterfaceDAO">
+									<property name="sessionFactory"><ref bean="sessionFactory"/></property>	
+								</bean>
+							</property>
                         </bean>
 					</property>
 					<property name="preInterceptors">

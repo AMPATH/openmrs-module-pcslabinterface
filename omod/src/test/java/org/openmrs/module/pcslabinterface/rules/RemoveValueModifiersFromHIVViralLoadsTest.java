@@ -73,5 +73,18 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 				new RemoveValueModifiersFromHIVViralLoads()
 						.transform(hl7string));
 	}
+	
+	/**
+	 * @see {@link RemoveValueModifiersFromHIVViralLoads#transform(String)}
+	 */
+	@Test
+	@Verifies(value = "should leave text following modifier alone if not a digit", method = "transform(String)")
+	public void transform_shouldLeaveTextFollowingModifierAloneIfNotADigit()
+			throws Exception {
+		String hl7string = "OBX|1|ST|856^HIV Viral Load^99DCT||INSUFFICIENT SAMPLE FOR ANALYSIS,PLEASE DRAW ADEQUATE SAMPLE.(>2MLS)|^Copies /mL|||||X|||201111221019|||||201201101130";
 
+		Assert.assertEquals(hl7string,
+				new RemoveValueModifiersFromHIVViralLoads()
+						.transform(hl7string));
+	}
 }

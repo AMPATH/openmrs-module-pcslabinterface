@@ -28,24 +28,27 @@ import org.apache.commons.logging.LogFactory;
 import org.openmrs.User;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
-import org.openmrs.module.pcslabinterface.LabMessage;
-import org.openmrs.module.pcslabinterface.LabMessageArchive;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceException;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceService;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceUtil;
+import org.openmrs.module.pcslabinterface.*;
 import org.openmrs.util.OpenmrsUtil;
 
 public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 	private Log log = LogFactory.getLog(super.getClass());
+	private PcsLabInterfaceDAO dao;
 
+	public void setDao(PcsLabInterfaceDAO dao) {
+		this.dao = dao;
+	}
+	
 	public SortedMap<String, String> getSystemVariables() {
 		if (!(Context.hasPrivilege("View Administration Functions"))) {
 			throw new APIAuthenticationException(
 					"Privilege required: View Administration Functions");
 		}
+		
 		TreeMap<String, String> systemVariables = new TreeMap<String, String>();
 		systemVariables.put("PCSLABINTERFACE_GP_QUEUE_DIR", PcsLabInterfaceUtil
 				.getQueueDir().getAbsolutePath());
+		
 		systemVariables.put("PCSLABINTERFACE_GP_QUEUE_ARCHIVE_DIR",
 				PcsLabInterfaceUtil.getArchiveDir(null).getAbsolutePath());
 
@@ -220,6 +223,15 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 
 	public void garbageCollect() {
 		System.gc();
+	}
+
+	/**
+	 * Get a list of all valid numeric concept ids
+	 * 
+	 * @return 
+	 */
+	public List<Integer> getNumericConceptIds() {
+		return dao.getNumericConceptIds();
 	}
 
 }

@@ -14,6 +14,7 @@
 package org.openmrs.module.pcslabinterface;
 
 import java.util.Collection;
+import java.util.List;
 import java.util.SortedMap;
 
 import org.openmrs.annotation.Authorized;
@@ -80,5 +81,7 @@ public abstract interface PcsLabInterfaceService {
 	@Transactional(readOnly = true)
 	@Authorized( { PcsLabInterfaceConstants.PRIV_VIEW_LAB_MESSAGE_ERROR })
 	public Integer getLabMessageArchiveSize();
+
+	public List<Integer> getNumericConceptIds();
 
 }

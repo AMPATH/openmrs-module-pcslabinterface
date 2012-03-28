@@ -36,7 +36,7 @@ public class PcsLabInterfaceQueueProcessor {
 			.compile("R01\\|([a-zA-Z0-9]+)\\|");
 
 	/**
-	 * processes a given queue into the HL7 in queue
+	 * processes a given lab message into the HL7 incoming queue
 	 * 
 	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#transformNextLabMessage()
 	 * @param labMessage
@@ -85,8 +85,8 @@ public class PcsLabInterfaceQueueProcessor {
 	 * @return results of processing the message
 	 * @should remove commas from HIV Viral Loads
 	 * @should correct values with modifiers from HIV Viral Loads
-	 * @should process values with both commas and modifiers from HIV Viral
-	 *         Loads
+	 * @should process values with both commas and modifiers from HIV Viral Loads
+	 * @should change ST to NM for numeric concepts
 	 */
 	protected String preProcessMessage(String data) {
 		// TODO '\r' happens to be the character between lines at this time, but

@@ -37,7 +37,6 @@ public class AdjustNegativeConceptForUrineProtein extends RegexTransformRule {
 	 * 
 	 * @should replace improper concept reference
 	 * @should not replace proper concept reference
-	 * @should replace 
 	 */
 	@Override
 	public String transform(String test) {
