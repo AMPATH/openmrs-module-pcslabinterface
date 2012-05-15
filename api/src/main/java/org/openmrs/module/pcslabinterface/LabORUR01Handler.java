@@ -349,7 +349,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 		for (Obs obs : encounter.getObsAtTopLevel(false)) {
 			recursivelySetEncounter(obs, null);
 			// the changeMessage here is not used
-			Context.getObsService().saveObs(obs, "new stand-along observation from orur01 handler");
+			Context.getObsService().saveObs(obs, "new stand-alone observation from orur01 handler");
 		}
 		
 		return oru;
