@@ -16,7 +16,8 @@ public class AdjustNegativeConceptForUrineProteinTest {
 			throws Exception {
 		String hl7string = "OBX|1|CWE|2339^URINE Protein^99DCT||^Negative^99DCT|||||||||20080206";
 
-		String expected = "OBX|1|CWE|2339^URINE Protein^99DCT||664^NEGATIVE^99DCT|||||||||20080206\r"
+		String expected = "OBX|1|CWE|2339^URINE Protein^99DCT||664^NEGATIVE^99DCT|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ "^Negative^99DCT";

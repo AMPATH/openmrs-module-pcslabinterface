@@ -15,7 +15,8 @@ public class RemoveCommasFromHIVViralLoadsTest {
 			throws Exception {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||123,456|||||||||20080206";
 
-		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||123456|||||||||20080206\r"
+		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||123456|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ "123,456";
@@ -33,7 +34,8 @@ public class RemoveCommasFromHIVViralLoadsTest {
 			throws Exception {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>123,456,789|||||||||20080206";
 
-		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||>123456789|||||||||20080206\r"
+		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||>123456789|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ ">123,456,789";

@@ -55,6 +55,10 @@ public class LabMessage {
 							.warn("File system url does not exist for lab message item.  Url: '"
 									+ this.fileSystemUrl + "'");
 				}
+			
+				// remove trailing newline from file if it exists
+				if (this.data != null && this.data.endsWith("\n"))
+					this.data = this.data.substring(0, this.data.length()-1);
 		}
 		return this.data;
 	}

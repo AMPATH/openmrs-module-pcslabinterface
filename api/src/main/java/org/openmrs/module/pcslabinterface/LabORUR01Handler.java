@@ -564,7 +564,11 @@ public class LabORUR01Handler extends ORUR01Handler {
 				log.warn("Not creating null valued obs for concept " + concept);
 				return null;
 			} else if (value.equals("0") || value.equals("1")) {
+				Integer conceptId = concept.getConceptId();
 				concept = concept.hydrate(concept.getConceptId().toString());
+				if (concept == null)
+					throw new HL7Exception("Could not find concept #" + conceptId);
+				
 				obs.setConcept(concept);
 				if (concept.getDatatype().isBoolean())
 					obs.setValueBoolean(value.equals("1"));
@@ -993,21 +997,27 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 */
 	private Patient getPatientByIdentifier(PID pid) throws HL7Exception {
 		CX[] patientIdentifierList = pid.getPatientIdentifierList();
+		if (patientIdentifierList.length == 0)
+			throw new HL7Exception("No patient identifiers found in PID segment.");
+
+		Set<String> identifiers = new HashSet<String>();
 		Set<Patient> matchingPatients = new HashSet<Patient>();
 		for (CX identifier : patientIdentifierList) {
 			String idNumber = identifier.getIDNumber().getValue();
 			String checkDigit = identifier.getCheckDigit().getValue();
 			if (!(idNumber.contains("-")) && checkDigit != null)
 				idNumber = idNumber + "-" + checkDigit;
+			identifiers.add(idNumber);
 			matchingPatients.addAll(Context.getPatientService().getPatients(null, idNumber, null, true));
 		}
 		if ((matchingPatients.isEmpty()) || (matchingPatients.size() != 1))
-			throw new HL7Exception("Could not resolve patient by identifier");
+			throw new HL7Exception("Could not find patient matching identifier(s): " + OpenmrsUtil.join(identifiers, ", "));
 		
 		for (Patient patient : matchingPatients) {
-			this.log.error("Matching hl7 PID patient_id: " + patient.getPatientId() + ", " + patient.getPatientIdentifier());
+			log.info("Matching hl7 PID patient_id: " + patient.getPatientId() + ", " + patient.getPatientIdentifier());
 			return patient;
 		}
+		
 		return null;
 	}
 	

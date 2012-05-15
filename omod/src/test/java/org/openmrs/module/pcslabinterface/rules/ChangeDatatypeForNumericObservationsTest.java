@@ -1,12 +1,7 @@
 package org.openmrs.module.pcslabinterface.rules;
 
-import java.util.Locale;
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.ConceptDatatype;
-import org.openmrs.ConceptName;
-import org.openmrs.ConceptNumeric;
-import org.openmrs.api.context.Context;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
 import org.openmrs.test.Verifies;
@@ -24,7 +19,8 @@ public class ChangeDatatypeForNumericObservationsTest extends BaseModuleContextS
 	public void transform_shouldReplaceSTWithNMForNumericConcepts() throws Exception {
 		String hl7string = "OBX|1|ST|5497^CD4 COUNT^99DCT||100.0|||||||||20080206";
 
-		String expected = "OBX|1|NM|5497^CD4 COUNT^99DCT||100.0|||||||||20080206\r"
+		String expected = "OBX|1|NM|5497^CD4 COUNT^99DCT||100.0|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ PcsLabInterfaceConstants.ST_TO_NM;

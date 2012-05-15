@@ -31,7 +31,9 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 	@Verifies(value = "should match strings with breaks in them", method = "RemoveValueModifiersFromHIVViralLoads()")
 	public void RemoveValueModifiersFromHIVViralLoads_shouldMatchStringsWithBreaksInThem()
 			throws Exception {
-		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>123456789|||||||||20080206\rNTE|||Hey now";
+		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>123456789|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
+				+ "NTE|||Hey now";
 		Assert.assertEquals(true,
 				new RemoveValueModifiersFromHIVViralLoads().matches(hl7string));
 	}
@@ -45,7 +47,8 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 			throws Exception {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||<400|||||||||20080206";
 
-		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||399|||||||||20080206\r"
+		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||399|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ "<400";
@@ -64,7 +67,8 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 			throws Exception {
 		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||>750000|||||||||20080206";
 
-		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||750001|||||||||20080206\r"
+		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||750001|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
 				+ "NTE|||"
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ ">750000";

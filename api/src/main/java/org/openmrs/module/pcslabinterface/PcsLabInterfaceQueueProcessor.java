@@ -98,16 +98,15 @@ public class PcsLabInterfaceQueueProcessor {
 
 		// loop through lines of the HL7
 		for (String line : lines) {
-			// loop through transform rules
-			for (TransformRule rule : PcsLabInterfaceConstants
-					.TRANSFORM_RULES())
-				if (rule.matches(line))
-					// TODO perhaps expect a list back from transform() so we
-					// can addAll() results
-					line = rule.transform(line);
-			// append the line to the results
-			results.add(line);
-		}
+				// loop through transform rules
+				for (TransformRule rule : PcsLabInterfaceConstants
+						.TRANSFORM_RULES())
+					if (rule.matches(line))
+						// TODO perhaps expect a list back from transform() so we can addAll() results
+						line = rule.transform(line);
+				// append the line to the results
+				results.add(line);
+			}
 
 		return StringUtils.collectionToDelimitedString(results,
 				PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);

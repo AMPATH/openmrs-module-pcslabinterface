@@ -19,7 +19,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 			.compile("OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
 
 	// this regex describes a simple comment pattern
-	private static final Pattern commentPattern = Pattern.compile("\\rNTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
+	private static final Pattern commentPattern = Pattern.compile("NTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
 	
 	/**
 	 * initializes the regex pattern for matching on a specific concept
