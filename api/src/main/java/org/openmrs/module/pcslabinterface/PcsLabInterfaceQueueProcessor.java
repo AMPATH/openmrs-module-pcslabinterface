@@ -87,6 +87,7 @@ public class PcsLabInterfaceQueueProcessor {
 	 * @should correct values with modifiers from HIV Viral Loads
 	 * @should process values with both commas and modifiers from HIV Viral Loads
 	 * @should change ST to NM for numeric concepts
+	 * @should remove null strings from final results
 	 */
 	protected String preProcessMessage(String data) {
 		// TODO '\r' happens to be the character between lines at this time, but
@@ -108,7 +109,14 @@ public class PcsLabInterfaceQueueProcessor {
 				results.add(line);
 			}
 
-		return StringUtils.collectionToDelimitedString(results,
+		// remove empty strings from list
+		List<String> finished = new ArrayList<String>();
+		for (String line: results) {
+		if (StringUtils.hasText(line))
+			finished.add(line);
+		}
+		
+		return StringUtils.collectionToDelimitedString(finished,
 				PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
 	}
 
