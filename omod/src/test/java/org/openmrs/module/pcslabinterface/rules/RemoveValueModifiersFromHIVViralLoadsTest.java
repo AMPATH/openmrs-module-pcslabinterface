@@ -91,4 +91,23 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 				new RemoveValueModifiersFromHIVViralLoads()
 						.transform(hl7string));
 	}
+	
+	/**
+	 * @see {@link RemoveValueModifiersFromHIVViralLoads#RemoveValueModifiersFromHIVViralLoads()}
+	 */
+	@Test
+	@Verifies(value = "work for any OBX referencing 856 regardless of name", method = "RemoveValueModifiersFromHIVViralLoads()")
+	public void RemoveValueModifiersFromHIVViralLoads_shouldWorkForAnyOBXReferencing856RegardlessOfName()
+			throws Exception {
+		String hl7string = "OBX|1|NM|856^Ack - foo Bar^99DCT||>750000|||||||||20080206";
+
+		String expected = "OBX|1|NM|856^Ack - foo Bar^99DCT||750001|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ ">750000";
+
+		Assert.assertEquals(expected,
+				new RemoveValueModifiersFromHIVViralLoads().transform(hl7string));
+	}
 }

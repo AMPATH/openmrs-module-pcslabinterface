@@ -17,19 +17,20 @@ public class RemoveCommasFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([^,\\|]*,[^\\|]*)\\|.*");
+			.compile("OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|([^,\\|]*,[^\\|]*)\\|.*");
 
 	/**
 	 * initializes the regex pattern for matching on a specific concept
 	 * 
 	 * @should match numeric and structured text OBX segments for HIV Viral Load with commas in the value
 	 * @should match values with other characters as long as there is at least one comma
+	 * @should work for any OBX referencing 856 regardless of name
 	 */
 	public RemoveCommasFromHIVViralLoads() {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[^,\\|]*,.*");
+				"OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|[^,\\|]*,.*");
 	}
 
 	/**

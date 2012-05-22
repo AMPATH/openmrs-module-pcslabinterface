@@ -16,7 +16,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private static final Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
+			.compile("OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
 
 	// this regex describes a simple comment pattern
 	private static final Pattern commentPattern = Pattern.compile("NTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
@@ -26,12 +26,13 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 	 * 
 	 * @should match only numeric OBX segments for HIV Viral Load with a modifier before the value
 	 * @should match strings with breaks in them
+	 * @should work for any OBX referencing 856 regardless of name
 	 */
 	public RemoveValueModifiersFromHIVViralLoads() {
 		// the follow regex ensures that the concept is HIV Viral Load and the
 		// value has at least one comma in it
 		super(
-				"OBX\\|\\d*\\|..\\|856\\^HIV Viral Load\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
+				"OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
 	}
 
 	/**

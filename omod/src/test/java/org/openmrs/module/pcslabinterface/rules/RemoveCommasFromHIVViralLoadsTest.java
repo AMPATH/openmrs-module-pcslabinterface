@@ -69,7 +69,6 @@ public class RemoveCommasFromHIVViralLoadsTest {
 
 	/**
 	 * @see {@link RemoveCommasFromHIVViralLoads#RemoveCommasFromHIVViralLoads()}
-	 * 
 	 */
 	@Test
 	@Verifies(value = "should match values with other characters as long as there is at least one comma", method = "RemoveCommasFromHIVViralLoads()")
@@ -85,4 +84,24 @@ public class RemoveCommasFromHIVViralLoadsTest {
 		Assert.assertEquals(false,
 				new RemoveCommasFromHIVViralLoads().matches(hl7string));
 	}
+
+	/**
+	 * @see {@link RemoveCommasFromHIVViralLoads#RemoveCommasFromHIVViralLoads()}
+	 */
+	@Test
+	@Verifies(value = "work for any OBX referencing 856 regardless of name", method = "RemoveCommasFromHIVViralLoads()")
+	public void RemoveCommasFromHIVViralLoads_shouldWorkForAnyOBXReferencing856RegardlessOfName()
+			throws Exception {
+		String hl7string = "OBX|1|NM|856^Ack - foo Bar^99DCT||>123,456,789|||||||||20080206";
+
+		String expected = "OBX|1|NM|856^Ack - foo Bar^99DCT||>123456789|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ ">123,456,789";
+
+		Assert.assertEquals(expected,
+				new RemoveCommasFromHIVViralLoads().transform(hl7string));
+	}
+
 }
