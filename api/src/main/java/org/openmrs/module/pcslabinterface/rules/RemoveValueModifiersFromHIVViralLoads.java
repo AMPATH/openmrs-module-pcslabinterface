@@ -16,7 +16,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 
 	// this regex ensures that the value has only digits and/or commas in it
 	private static final Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|([<>]\\d+)\\|");
+			.compile("OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|([<>] *\\d+)\\|");
 
 	// this regex describes a simple comment pattern
 	private static final Pattern commentPattern = Pattern.compile("NTE\\|\\|\\|" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED);
@@ -29,10 +29,10 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 	 * @should work for any OBX referencing 856 regardless of name
 	 */
 	public RemoveValueModifiersFromHIVViralLoads() {
-		// the follow regex ensures that the concept is HIV Viral Load and the
-		// value has at least one comma in it
+		// the follow regex ensures that the concept is 856 and the
+		// value begins with a modifier followed by 0 or more spaces, then a digit
 		super(
-				"OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|[<>]\\d+\\|");
+				"OBX\\|\\d*\\|..\\|856\\^.+\\^99DCT\\|[^\\|]*\\|[<>] *\\d+\\|");
 	}
 
 	/**
@@ -50,13 +50,13 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 			return test;
 
 		// yank the value from the test string
-		String value = m.group(1);
+		String original = m.group(1);
 
 		// get modifier from the first character
-		char modifier = value.charAt(0);
+		char modifier = original.charAt(0);
 
 		// remove modifier from the value
-		value = value.substring(1);
+		String value = original.substring(1).trim();
 
 		Integer newValue = null;
 		// test to see if newValue really is an Integer
@@ -74,7 +74,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 		newValue = (modifier == '<') ? newValue - 1 : newValue + 1;
 
 		// replace first occurrence of value with newValue
-		test = test.replaceFirst(modifier + value, newValue.toString());
+		test = test.replaceFirst(original, newValue.toString());
 
 		// no need to comment if one already exists
 		if (commentPattern.matcher(test).find())
@@ -84,6 +84,6 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
 				.concat("NTE|||")
 				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
-				.concat(modifier + value);
+				.concat(original);
 	}
 }

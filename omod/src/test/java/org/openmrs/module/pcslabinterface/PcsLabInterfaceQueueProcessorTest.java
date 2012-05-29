@@ -104,6 +104,37 @@ public class PcsLabInterfaceQueueProcessorTest extends BaseModuleContextSensitiv
 	 * @see {@link PcsLabInterfaceQueueProcessor#preProcessMessage(String)}
 	 */
 	@Test
+	@Verifies(value = "should correct HIV Viral Load values with modifiers and spaces", method = "preProcessMessage(String)")
+	public void preProcessMessage_shouldCorrectHIVViralLoadValuesWithModifiersAndSpaces()
+			throws Exception {
+		String hl7string = PcsLabInterfaceTestUtil.makeMessage(
+			"MSH|^~\\&|PCSLABPLUS|AMRS.ELD|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|JqnfhKKtouEz8kzTk6Zo|P|2.5|1||||||||16^AMRS.ELD.FORMID",
+			"PID|||3^^^^||John3^Doe^||",
+			"PV1||O|1^Unknown Location||||1^Super User (1-8)|||||||||||||||||||||||||||||||||||||20080212|||||||V",
+			"ORC|RE||||||||20080226102537|1^Super User",
+			"OBR|1|||1238^MEDICAL RECORD OBSERVATIONS^99DCT",
+			"OBX|1|NM|856^HIV Viral Load^99DCT||< 40|||||||||20080206",
+			"OBX|2|NM|856^HIV Viral Load^99DCT||54321|||||||||20080206");
+
+		String expected = PcsLabInterfaceTestUtil.makeMessage(
+			"MSH|^~\\&|PCSLABPLUS|AMRS.ELD|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|JqnfhKKtouEz8kzTk6Zo|P|2.5|1||||||||16^AMRS.ELD.FORMID",
+			"PID|||3^^^^||John3^Doe^||",
+			"PV1||O|1^Unknown Location||||1^Super User (1-8)|||||||||||||||||||||||||||||||||||||20080212|||||||V",
+			"ORC|RE||||||||20080226102537|1^Super User",
+			"OBR|1|||1238^MEDICAL RECORD OBSERVATIONS^99DCT",
+			"OBX|1|NM|856^HIV Viral Load^99DCT||39|||||||||20080206",
+			"NTE|||" + PcsLabInterfaceConstants.LAB_VALUE_MODIFIED + "< 40",
+			"OBX|2|NM|856^HIV Viral Load^99DCT||54321|||||||||20080206");
+
+		String actual = new PcsLabInterfaceQueueProcessor().preProcessMessage(hl7string);
+		
+		Assert.assertEquals(expected, actual);
+	}
+
+	/**
+	 * @see {@link PcsLabInterfaceQueueProcessor#preProcessMessage(String)}
+	 */
+	@Test
 	@Verifies(value = "should process values with both commas and modifiers from HIV Viral Loads", method = "preProcessMessage(String)")
 	public void preProcessMessage_shouldProcessValuesWithBothCommasAndModifiersFromHIVViralLoads()
 			throws Exception {

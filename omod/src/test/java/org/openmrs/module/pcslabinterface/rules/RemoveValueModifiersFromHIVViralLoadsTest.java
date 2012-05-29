@@ -28,6 +28,24 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 	 * @see {@link RemoveValueModifiersFromHIVViralLoads#RemoveValueModifiersFromHIVViralLoads()}
 	 */
 	@Test
+	@Verifies(value = "should match values with modifiers and values separated by spaces", method = "RemoveValueModifiersFromHIVViralLoads()")
+	public void RemoveValueModifiersFromHIVViralLoads_shouldMatchValuesWithModifiersAndValuesSeparatedBySpaces()
+			throws Exception {
+		// with space
+		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||< 40|||||||||20080206";
+		Assert.assertEquals(true,
+				new RemoveValueModifiersFromHIVViralLoads().matches(hl7string));
+
+		// space but not a number
+		hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||< abc|||||||||20080206";
+		Assert.assertEquals(false,
+				new RemoveValueModifiersFromHIVViralLoads().matches(hl7string));
+	}
+
+	/**
+	 * @see {@link RemoveValueModifiersFromHIVViralLoads#RemoveValueModifiersFromHIVViralLoads()}
+	 */
+	@Test
 	@Verifies(value = "should match strings with breaks in them", method = "RemoveValueModifiersFromHIVViralLoads()")
 	public void RemoveValueModifiersFromHIVViralLoads_shouldMatchStringsWithBreaksInThem()
 			throws Exception {
@@ -58,6 +76,26 @@ public class RemoveValueModifiersFromHIVViralLoadsTest {
 						.transform(hl7string));
 	}
 
+	/**
+	 * @see {@link RemoveValueModifiersFromHIVViralLoads#transform(String)}
+	 */
+	@Test
+	@Verifies(value = "should modify value if spaces exist between modifier and value", method = "transform(String)")
+	public void transform_shouldModifyValueIfSpacesExistBetweenModifierAndValue()
+			throws Exception {
+		String hl7string = "OBX|1|NM|856^HIV Viral Load^99DCT||< 40|||||||||20080206";
+
+		String expected = "OBX|1|NM|856^HIV Viral Load^99DCT||39|||||||||20080206"
+				+ PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE
+				+ "NTE|||"
+				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
+				+ "< 40";
+
+		Assert.assertEquals(expected,
+				new RemoveValueModifiersFromHIVViralLoads()
+						.transform(hl7string));
+	}
+	
 	/**
 	 * @see {@link RemoveValueModifiersFromHIVViralLoads#transform(String)}
 	 */
