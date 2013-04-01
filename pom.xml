@@ -12,9 +12,9 @@
 	<url>http://openmrs.org</url>
 
 	<scm>
-		<connection>scm:svn:http://svn.openmrs.org/openmrs-modules/pcslabinterface/trunk/</connection>
-		<developerConnection>scm:svn:http://svn.openmrs.org/openmrs-modules/pcslabinterface/trunk/</developerConnection>
-		<url>http://svn.openmrs.org/openmrs-modules/pcslabinterface/trunk/</url>
+		<connection>scm:git:https://github.com/AMPATH/openmrs-module-pcslabinterface</connection>
+		<developerConnection>scm:git:https://github.com/AMPATH/openmrs-module-pcslabinterface</developerConnection>
+		<url>https://github.com/AMPATH/openmrs-module-pcslabinterface</url>
 	</scm>
 
 	<modules>
