@@ -132,6 +132,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * @should allow default ORUR01Handler to handle messages that are not from REFPACS or PCS
 	 * @should create an encounter with no form if no form id is provided
 	 * @should create an encounter with no encounter type if none is provided
+	 * @should not create an encounter if no PV1 segment is in the message
 	 */
 	public Message processMessage(Message message) throws ApplicationException {
 
@@ -191,6 +192,8 @@ public class LabORUR01Handler extends ORUR01Handler {
 		Patient patient = getPatientByIdentifier(pid);
 		if (log.isDebugEnabled())
 			log.debug("Processing HL7 message for patient " + patient.getPatientId());
+
+		// create an encounter
 		Encounter encounter = createEncounter(msh, patient, pv1, orc);
 
 		// do the discharge to location logic
@@ -351,21 +354,26 @@ public class LabORUR01Handler extends ORUR01Handler {
 			log.debug("Current thread: " + Thread.currentThread());
 			log.debug("Creating the encounter object");
 		}
-		Context.getEncounterService().saveEncounter(encounter);
 
-		// Notify HL7 service that we have created a new encounter, allowing
-		// features/modules to trigger on HL7-generated encounters.
-		// -This can be removed once we have a obs_group table and all
-		// obs can be created in memory as part of the encounter *before* we
-		// call EncounterService.createEncounter().  For now, making obs groups
-		// requires that one obs be created (in the database) before others can
-		// be linked to it, forcing us to save the encounter prematurely."
-		//
-		// NOTE: The above referenced fix is now done.  This method is
-		// deprecated and will be removed in the next release.  All modules
-		// should modify their AOP methods to hook around
-		// EncounterService.createEncounter(Encounter).
-		hl7Service.encounterCreated(encounter);
+		if (isValidEncounter(encounter)) {
+			saveEncounter(encounter);
+
+			// Notify HL7 service that we have created a new encounter, allowing
+			// features/modules to trigger on HL7-generated encounters.
+			// -This can be removed once we have a obs_group table and all
+			// obs can be created in memory as part of the encounter *before* we
+			// call EncounterService.createEncounter().  For now, making obs groups
+			// requires that one obs be created (in the database) before others can
+			// be linked to it, forcing us to save the encounter prematurely."
+			//
+			// NOTE: The above referenced fix is now done.  This method is
+			// deprecated and will be removed in the next release.  All modules
+			// should modify their AOP methods to hook around
+			// EncounterService.createEncounter(Encounter).
+			hl7Service.encounterCreated(encounter);
+		} else {
+			saveObsFromEncounter(encounter);
+		}
 
 		// loop over the proposed concepts and save each to the database
 		// now that the encounter is saved
@@ -393,6 +401,20 @@ public class LabORUR01Handler extends ORUR01Handler {
 		Context.flushSession();
 
 		return oru;
+	}
+
+	private void saveObsFromEncounter(Encounter encounter) throws HL7Exception {
+		// save each obs but not the encounter object
+		// can't use getAllObs() method here because of how cascade saving is done
+		for (Obs obs : encounter.getObsAtTopLevel(false)) {
+			recursivelySetEncounter(obs, null);
+			// the changeMessage here is not used
+			Context.getObsService().saveObs(obs, "new stand-alone observation from orur01 handler");
+		}
+	}
+
+	private void saveEncounter(Encounter encounter) throws HL7Exception {
+		Context.getEncounterService().saveEncounter(encounter);
 	}
 
 	/**
@@ -467,6 +489,34 @@ public class LabORUR01Handler extends ORUR01Handler {
 		}
 	}
 
+	/**
+	 * This is needed for hl7 messages that don't want to create an encounter. The encounter object
+	 * is just used as a temporary container for obs and then is thrown away. We are deleting that
+	 * here. <br/>
+	 * This is needed instead of using encounter.getAllObs because of how cascading and saving works
+	 * with hibernate
+	 *
+	 * @param obs the obs to set the given encounter onto (and its child objects)
+	 * @param encounter the encounter to set
+	 */
+	private void recursivelySetEncounter(Obs obs, Encounter encounter) {
+		obs.setEncounter(encounter);
+		if (obs.hasGroupMembers())
+			for (Obs childObs : obs.getGroupMembers())
+				recursivelySetEncounter(childObs, encounter);
+	}
+
+	/**
+	 * Validates an encounter
+	 */
+	private boolean isValidEncounter(Encounter encounter) throws HL7Exception {
+		if (encounter.getEncounterDatetime() == null ||
+				encounter.getProvider() == null ||
+				encounter.getPatient() == null)
+			return false;
+		return true;
+	}
+
 	private MSH getMSH(ORU_R01 oru) {
 		return oru.getMSH();
 	}
@@ -509,17 +559,19 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 */
 	private Encounter createEncounter(MSH msh, Patient patient, PV1 pv1, ORC orc) throws HL7Exception {
 
-		// the encounter we will return
-		Encounter encounter = null;
+		// get the referenced encounterId if it is in the PV1 segment
+		Integer encounterId = null;
 
 		// look for the encounter id in PV1-19
 		CX visitNumber = pv1.getVisitNumber();
-		Integer encounterId = null;
 		try {
 			encounterId = Integer.valueOf(visitNumber.getIDNumber().getValue());
 		} catch (NumberFormatException e) {
 			// pass
 		}
+
+		// the encounter we will return
+		Encounter encounter;
 
 		// if an encounterId was passed in, assume that these obs are
 		// going to be appended to it.  Fetch the old encounter from
@@ -939,6 +991,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 	}
 
 	private Person getProvider(PV1 pv1) throws HL7Exception {
+		if (pv1.getAttendingDoctor().length == 0)
+			return null;
+
 		XCN hl7Provider = pv1.getAttendingDoctor(0);
 		Integer providerId = Context.getHL7Service().resolvePersonId(hl7Provider);
 		if (providerId == null)
@@ -970,6 +1025,10 @@ public class LabORUR01Handler extends ORUR01Handler {
 
 	private Location getLocation(PV1 pv1) throws HL7Exception {
 		PL hl7Location = pv1.getAssignedPatientLocation();
+
+		if (hl7Location.getPointOfCare().getValue() == null)
+			return null;
+
 		Integer locationId = Context.getHL7Service().resolveLocationId(hl7Location);
 		if (locationId == null)
 			throw new HL7Exception("Could not resolve location");
@@ -1017,6 +1076,10 @@ public class LabORUR01Handler extends ORUR01Handler {
 	private Date tsToDate(TS ts) throws HL7Exception {
 		// need to handle timezone
 		String dtm = ts.getTime().getValue();
+
+		if (dtm == null)
+			return null;
+
 		int year = Integer.parseInt(dtm.substring(0, 4));
 		int month = (dtm.length() >= 6 ? Integer.parseInt(dtm.substring(4, 6)) - 1 : 0);
 		int day = (dtm.length() >= 8 ? Integer.parseInt(dtm.substring(6, 8)) : 1);
@@ -1053,6 +1116,10 @@ public class LabORUR01Handler extends ORUR01Handler {
 		// Update patient's location if it has changed
 		if (log.isDebugEnabled())
 			log.debug("Checking for discharge to location");
+
+//		if (pv1 == null)
+//			return;
+
 		DLD dld = pv1.getDischargedToLocation();
 		log.debug("DLD = " + dld);
 		if (dld == null)

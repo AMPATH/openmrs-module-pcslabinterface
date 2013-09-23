@@ -252,4 +252,33 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 		Encounter e = encForPatient3.get(0);
 		assertNull(e.getEncounterType());
 	}
+
+	/**
+	 * @verifies not create an encounter if no PV1 segment is in the message
+	 * @see LabORUR01Handler#processMessage(ca.uhn.hl7v2.model.Message)
+	 */
+	@Test
+	public void processMessage_shouldNotCreateAnEncounterIfNoPV1SegmentIsInTheMessage() throws Exception {
+		String hl7string = "MSH|^~\\&|PCSLABPLUS|PCS|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||\r"
+				+ "PID|||3^^^^L||John3^Doe^\r"
+				+ "ORC|RE||||||||20080226102537|1^Super User\r"
+				+ "OBR|1|||1238^MEDICAL RECORD OBSERVATIONS^99DCT\r"
+				+ "OBX|1|NM|5497^CD4, BY FACS^99DCT||450|||||||||20080206\r"
+				+ "OBX|2|DT|5096^RETURN VISIT DATE^99DCT||20080229|||||||||20080212";
+
+		Message hl7message = parser.parse(hl7string);
+		router.processMessage(hl7message);
+
+		Patient patient = new Patient(3);
+
+		// check for an encounter
+		List<Encounter> encounters = Context.getEncounterService().getEncountersByPatient(patient);
+		assertNotNull(encounters);
+		assertTrue(encounters.isEmpty());
+
+		// check for obses
+		List<Obs> obses = Context.getObsService().getObservationsByPerson(patient);
+		assertFalse(obses.isEmpty());
+		assertEquals(obses.size(), 2);
+	}
 }
