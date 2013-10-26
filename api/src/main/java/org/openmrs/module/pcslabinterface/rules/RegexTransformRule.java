@@ -48,6 +48,8 @@ abstract public class RegexTransformRule implements TransformRule {
 	 * @see org.openmrs.module.pcslabinterface.rules.TransformRule#matches(java.lang.String)
 	 */
 	public boolean matches(String test) {
+		if (test == null)
+			return false;
 		if (getRegex() != null)
 			return getRegex().matcher(test).find();
 		return false;

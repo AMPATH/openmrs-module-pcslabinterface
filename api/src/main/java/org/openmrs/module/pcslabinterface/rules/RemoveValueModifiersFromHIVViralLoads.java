@@ -58,7 +58,7 @@ public class RemoveValueModifiersFromHIVViralLoads extends RegexTransformRule {
 		// remove modifier from the value
 		String value = original.substring(1).trim();
 
-		Integer newValue = null;
+		Integer newValue;
 		// test to see if newValue really is an Integer
 		try {
 			newValue = Integer.valueOf(value);
