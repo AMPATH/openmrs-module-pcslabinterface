@@ -16,15 +16,21 @@ package org.openmrs.module.pcslabinterface.rules;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 
 public class RemovePV1SegmentTest {
+
 	/**
 	 * @verifies remove the PV1 segment
 	 * @see RemovePV1Segment#transform(String)
 	 */
 	@Test
 	public void transform_shouldRemoveThePV1Segment() throws Exception {
-		//TODO auto-generated
-		Assert.fail("Not yet implemented");
+		String hl7string = "PV1||O|1^Unknown Location||||1^Super User (1-8)|||||||||||||||||||||||||||||||||||||20080212|||||||V";
+
+		String expected = null;
+
+		Assert.assertEquals(expected,
+				new RemovePV1Segment().transform(hl7string));
 	}
 }

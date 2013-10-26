@@ -6,48 +6,38 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * PCS messages have form references in the MSH; we do not have a form
- * for labs, so this should be removed.
+ * PCS messages need to be entered as headless (no encounter).  The signal
+ * for this is removing the PV1 segment from the HL7.
  * 
  * @author jkeiper
  */
 public class RemovePV1Segment extends RegexTransformRule {
 
-	// this regex ensures that the MSH is referencing a form
+	// this regex ensures that this line is the PV1
 	private Pattern valuePattern = Pattern
-			.compile("MSH\\|.+\\|\\d+\\^AMRS.ELD.FORMID");
+			.compile("PV1\\|.+");
 
 	/**
 	 * initializes the regex pattern
-	 *
-	 * @should match only numeric OBX segments for HIV Viral Load with commas in the value
-	 * @should match values with other characters as long as there is at least one comma
 	 */
 	public RemovePV1Segment() {
-		// the following regex ensures that the MSH is referencing a form
-		super("MSH\\|.+\\|\\d\\^AMRS.ELD.FORMID");
+		// the following regex ensures that this segment is PV1
+		super("PV1\\|.+");
 	}
 
 	/**
-	 * transforms the string by removing the form information
+	 * transforms the string by removing the PV1
 	 * 
-	 * @should replace improper concept reference
-	 * @should not replace proper concept reference
+	 * @should remove the PV1 segment
 	 */
 	@Override
 	public String transform(String test) {
-		// check to make sure the value is truly just numbers and commas
+
+		// check for validity
 		Matcher m = valuePattern.matcher(test);
 		if (!m.matches())
 			return test;
 
-		// take off the chunk we don't want
-		test = test.replaceFirst("\\^Negative\\^99DCT", "664^NEGATIVE^99DCT");
-
-		// append a comment describing the change
-		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
-				.concat("NTE|||")
-				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
-				.concat("^Negative^99DCT");
+		return null;
 	}
 }

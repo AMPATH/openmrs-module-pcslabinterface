@@ -41,7 +41,8 @@ public class PcsLabInterfaceConstants {
 					new RemoveCommasFromHIVViralLoads(),
 					new RemoveValueModifiersFromHIVViralLoads(),
                     new AdjustNegativeConceptForUrineProtein(),
-					new RemoveDNAPCRNullValueSegments()
+					new RemoveDNAPCRNullValueSegments(),
+					new RemovePV1Segment()
 			};
 		return rules;
 	};
