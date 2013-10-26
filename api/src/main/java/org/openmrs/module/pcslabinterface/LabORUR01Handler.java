@@ -96,7 +96,8 @@ public class LabORUR01Handler extends ORUR01Handler {
 
 	private List<String> allowedSendingApps = Arrays.asList(
 			"refpacs",
-			"pcslabplus"
+			"pcslabplus",
+			"eid"
 	);
 
 	/**
@@ -133,6 +134,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * @should create an encounter with no form if no form id is provided
 	 * @should create an encounter with no encounter type if none is provided
 	 * @should not create an encounter if no PV1 segment is in the message
+	 * @should throw an HL7Exception if a null value is in OBX5
 	 */
 	public Message processMessage(Message message) throws ApplicationException {
 
@@ -291,6 +293,11 @@ public class LabORUR01Handler extends ORUR01Handler {
 				try {
 					log.debug("Parsing observation");
 					List<Obs> obses = parseObs(encounter, obx, obr, messageControlId);
+
+					// throw an error if no value was found
+					if (obses == null) {
+						throw new HL7Exception("null value in OBX-5");
+					}
 
 					// initialize and increment value group id counters
 					if (obses.size() > 1) {
@@ -496,7 +503,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * This is needed instead of using encounter.getAllObs because of how cascading and saving works
 	 * with hibernate
 	 *
-	 * @param obs the obs to set the given encounter onto (and its child objects)
+	 * @param obs       the obs to set the given encounter onto (and its child objects)
 	 * @param encounter the encounter to set
 	 */
 	private void recursivelySetEncounter(Obs obs, Encounter encounter) {
@@ -990,11 +997,22 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return tsToDate(pv1.getAdmitDateTime());
 	}
 
+	private Person getProviderBySystemId(String systemId) {
+		return Context.getService(PcsLabInterfaceService.class).getProviderBySystemId(systemId);
+	}
+
 	private Person getProvider(PV1 pv1) throws HL7Exception {
 		if (pv1.getAttendingDoctor().length == 0)
 			return null;
 
 		XCN hl7Provider = pv1.getAttendingDoctor(0);
+
+		// PCS sends systemIds for provider identifier
+		String identifier = hl7Provider.getIDNumber().getValue();
+		if (identifier.matches("\\d+-\\d")) {
+			return getProviderBySystemId(identifier);
+		}
+
 		Integer providerId = Context.getHL7Service().resolvePersonId(hl7Provider);
 		if (providerId == null)
 			throw new HL7Exception("Could not resolve provider");
@@ -1042,7 +1060,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 		try {
 			formId = Integer.parseInt(msh.getMessageProfileIdentifier(0).getEntityIdentifier().getValue());
 		} catch (Exception e) {
-			log.warn("Error parsing form id from message, using null form", e);
+			log.warn("Error parsing form id from message, using null form");
 		}
 
 		// must get entire form object in order to get its metadata
@@ -1116,9 +1134,6 @@ public class LabORUR01Handler extends ORUR01Handler {
 		// Update patient's location if it has changed
 		if (log.isDebugEnabled())
 			log.debug("Checking for discharge to location");
-
-//		if (pv1 == null)
-//			return;
 
 		DLD dld = pv1.getDischargedToLocation();
 		log.debug("DLD = " + dld);
