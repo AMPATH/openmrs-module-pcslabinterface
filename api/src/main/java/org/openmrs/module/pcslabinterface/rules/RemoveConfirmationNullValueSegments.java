@@ -4,7 +4,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * PCS is sending some DNA PCR test results with null values
+ * PCS is sending some Confirmation results with null values
  * 
  * @author jkeiper
  */
@@ -12,7 +12,7 @@ public class RemoveConfirmationNullValueSegments extends RegexTransformRule {
 
 	// this regex ensures that the segment is for DNA PCR with a null value
 	private Pattern valuePattern = Pattern
-			.compile("OBX\\|\\d+\\|\\w+\\|1030\\^.+\\^99DCT\\|\\|\\^\\^99DCT\\|.+");
+			.compile("OBX\\|\\d+\\|\\w+\\|2311\\^.+\\^99DCT\\|\\|\\^\\^99DCT\\|.+");
 
 	/**
 	 * initializes the regex pattern for matching
@@ -21,7 +21,7 @@ public class RemoveConfirmationNullValueSegments extends RegexTransformRule {
 	 */
 	public RemoveConfirmationNullValueSegments() {
 		// this regex ensures that the segment is for DNA PCR with a null value
-		super("OBX\\|\\d+\\|\\w+\\|1030\\^.+\\^99DCT\\|\\|\\^\\^99DCT\\|.+");
+		super("OBX\\|\\d+\\|\\w+\\|2311\\^.+\\^99DCT\\|\\|\\^\\^99DCT\\|.+");
 	}
 
 	/**
