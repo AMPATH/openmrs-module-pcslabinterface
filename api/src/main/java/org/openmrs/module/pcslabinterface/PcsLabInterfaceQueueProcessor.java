@@ -13,11 +13,6 @@
  */
 package org.openmrs.module.pcslabinterface;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.api.APIException;
@@ -26,6 +21,11 @@ import org.openmrs.hl7.HL7InQueue;
 import org.openmrs.module.pcslabinterface.rules.TransformRule;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Transactional
 public class PcsLabInterfaceQueueProcessor {
@@ -37,9 +37,6 @@ public class PcsLabInterfaceQueueProcessor {
 
 	/**
 	 * processes a given lab message into the HL7 incoming queue
-	 * 
-	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#transformNextLabMessage()
-	 * @param labMessage
 	 */
 	public void parseLabMessage(LabMessage labMessage) {
 		log.debug("Transforming LabMessage");
@@ -57,6 +54,7 @@ public class PcsLabInterfaceQueueProcessor {
 
 		// generate the source key
 		String hl7SourceKey = String.valueOf(labMessage.getLabMessageId());
+
 		// if possible, extract the source key from the lab message
 		// TODO use an HL7 parser to find it
 		Matcher m = keyPattern.matcher(labMessage.getData());
@@ -80,16 +78,23 @@ public class PcsLabInterfaceQueueProcessor {
 
 	/**
 	 * process the message and apply rules
-	 * 
+	 *
 	 * @param data the message to be processed
 	 * @return results of processing the message
 	 * @should remove commas from HIV Viral Loads
 	 * @should correct values with modifiers from HIV Viral Loads
 	 * @should process values with both commas and modifiers from HIV Viral Loads
 	 * @should change ST to NM for numeric concepts
+	 * @should not process EID messages
 	 * @should remove null strings from final results
 	 */
 	protected String preProcessMessage(String data) {
+
+		// bail if not a PCS message
+		if (data == null || !data.contains("PCSLABPLUS")) {
+			return data;
+		}
+
 		// TODO '\r' happens to be the character between lines at this time, but
 		// this may not always be the case. we should make this more flexible to
 		// recognize line endings
@@ -99,32 +104,32 @@ public class PcsLabInterfaceQueueProcessor {
 
 		// loop through lines of the HL7
 		for (String line : lines) {
-				// loop through transform rules
-				for (TransformRule rule : PcsLabInterfaceConstants
-						.TRANSFORM_RULES())
-					if (rule.matches(line))
-						// TODO perhaps expect a list back from transform() so we can addAll() results
-						line = rule.transform(line);
-				// append the line to the results
-				results.add(line);
-			}
+			// loop through transform rules
+			for (TransformRule rule : PcsLabInterfaceConstants
+					.TRANSFORM_RULES())
+				if (rule.matches(line))
+					// TODO perhaps expect a list back from transform() so we can addAll() results
+					line = rule.transform(line);
+			// append the line to the results
+			results.add(line);
+		}
 
 		// remove empty strings from list
 		List<String> finished = new ArrayList<String>();
-		for (String line: results) {
-		if (StringUtils.hasText(line))
-			finished.add(line);
+		for (String line : results) {
+			if (StringUtils.hasText(line))
+				finished.add(line);
 		}
-		
+
 		return StringUtils.collectionToDelimitedString(finished,
 				PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE);
 	}
 
 	/**
 	 * picks the next queue and transforms it
-	 * 
-	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#processLabMessageQueue()
+	 *
 	 * @return
+	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueProcessor#processLabMessageQueue()
 	 */
 	public boolean transformNextLabMessage() {
 		boolean transformOccurred = false;
@@ -146,9 +151,6 @@ public class PcsLabInterfaceQueueProcessor {
 
 	/**
 	 * iterates over queue contents for transformation
-	 * 
-	 * @see org.openmrs.module.pcslabinterface.PcsLabInterfaceQueueTask#execute()
-	 * @throws APIException
 	 */
 	public void processLabMessageQueue() throws APIException {
 		synchronized (isRunning) {
