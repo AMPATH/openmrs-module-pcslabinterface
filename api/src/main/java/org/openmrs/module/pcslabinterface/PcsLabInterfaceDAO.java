@@ -4,6 +4,8 @@
  */
 package org.openmrs.module.pcslabinterface;
 
+import org.openmrs.Person;
+
 import java.util.List;
 
 /**
@@ -13,5 +15,6 @@ import java.util.List;
 public interface PcsLabInterfaceDAO {
 
 	public List<Integer> getNumericConceptIds();
-	
+
+	Person getProviderBySystemId(String systemId);
 }

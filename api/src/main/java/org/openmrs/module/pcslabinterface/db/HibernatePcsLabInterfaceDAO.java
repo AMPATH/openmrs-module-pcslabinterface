@@ -5,15 +5,17 @@
 package org.openmrs.module.pcslabinterface.db;
 
 import java.util.List;
+
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.ConceptNumeric;
+import org.openmrs.Person;
+import org.openmrs.User;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceDAO;
 
 /**
- *
  * @author jkeiper
  */
 public class HibernatePcsLabInterfaceDAO implements PcsLabInterfaceDAO {
@@ -23,9 +25,6 @@ public class HibernatePcsLabInterfaceDAO implements PcsLabInterfaceDAO {
 	 */
 	private SessionFactory sessionFactory;
 
-	/**
-	 * @see DataIntegrityDAO#setSessionFactory(SessionFactory)
-	 */
 	public void setSessionFactory(SessionFactory sessionFactory) {
 		this.sessionFactory = sessionFactory;
 	}
@@ -35,5 +34,13 @@ public class HibernatePcsLabInterfaceDAO implements PcsLabInterfaceDAO {
 				.setProjection(Projections.id());
 		return crit.list();
 	}
-	
+
+	public Person getProviderBySystemId(String systemId) {
+		Criteria crit = sessionFactory.getCurrentSession().createCriteria(User.class)
+				.add(Restrictions.eq("systemId", systemId))
+				.setProjection(Projections.property("person"));
+
+		return (Person) crit.uniqueResult();
+	}
+
 }
