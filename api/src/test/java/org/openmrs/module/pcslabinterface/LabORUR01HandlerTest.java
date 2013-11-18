@@ -299,11 +299,11 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 	}
 
 	/**
-	 * @verifies look for provider and location in PD1 segment
+	 * @verifies look for location in PD1 segment
 	 * @see LabORUR01Handler#processMessage(ca.uhn.hl7v2.model.Message)
 	 */
 	@Test
-	public void processMessage_shouldLookForProviderAndLocationInPD1Segment() throws Exception {
+	public void processMessage_shouldLookForLocationInPD1Segment() throws Exception {
 		String hl7string = "MSH|^~\\&|PCSLABPLUS|PCS|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||\r"
 				+ "PID|||3^^^^L||John3^Doe^\r"
 				+ "PD1|||Unknown Location^D^1^^^AMRS^L^AMPATH|1^Super User (1-8)\r"

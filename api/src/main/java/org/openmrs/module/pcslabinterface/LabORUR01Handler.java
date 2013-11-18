@@ -136,7 +136,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * @should create an encounter with no encounter type if none is provided
 	 * @should not create an encounter if no PV1 segment is in the message
 	 * @should throw an HL7Exception if a null value is in OBX5
-	 * @should look for provider and location in PD1 segment
+	 * @should look for location in PD1 segment
 	 */
 	public Message processMessage(Message message) throws ApplicationException {
 
@@ -1012,13 +1012,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 		// prefer PV1
 		PV1 pv1 = getPV1(oru);
 		Person provider = getProvider(pv1);
-		if (provider != null) {
-			return provider;
-		}
-		// try PD1 if not found in PV1
-//		PD1 pd1 = getPD1(oru);
-//		return getProvider(pd1);
-		return null;
+
+		// TODO add logic here to find it from the PD1
+		return provider;
 	}
 
 	private Person getProvider(PV1 pv1) throws HL7Exception {
