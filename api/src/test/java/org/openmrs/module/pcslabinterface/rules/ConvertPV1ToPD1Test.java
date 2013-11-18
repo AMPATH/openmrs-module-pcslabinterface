@@ -16,21 +16,17 @@ package org.openmrs.module.pcslabinterface.rules;
 
 import org.junit.Assert;
 import org.junit.Test;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 
-public class RemovePV1SegmentTest {
+public class ConvertPV1ToPD1Test {
 
 	/**
-	 * @verifies remove the PV1 segment
-	 * @see RemovePV1Segment#transform(String)
+	 * @verifies convert the PV1 segment to a PD1
+	 * @see ConvertPV1ToPD1#transform(String)
 	 */
 	@Test
-	public void transform_shouldRemoveThePV1Segment() throws Exception {
+	public void transform_shouldConvertThePV1SegmentToAPD1() throws Exception {
 		String hl7string = "PV1||O|1^Unknown Location||||1^Super User (1-8)|||||||||||||||||||||||||||||||||||||20080212|||||||V";
-
-		String expected = null;
-
-		Assert.assertEquals(expected,
-				new RemovePV1Segment().transform(hl7string));
+		String expected = "PD1|||Unknown Location^D^1^^^AMRS^L^AMPATH|1^Super User (1-8)";
+		Assert.assertEquals(expected, new ConvertPV1ToPD1().transform(hl7string));
 	}
 }

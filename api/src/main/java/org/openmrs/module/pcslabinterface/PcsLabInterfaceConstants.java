@@ -15,10 +15,10 @@ package org.openmrs.module.pcslabinterface;
 
 import org.openmrs.module.pcslabinterface.rules.AdjustNegativeConceptForUrineProtein;
 import org.openmrs.module.pcslabinterface.rules.ChangeDatatypeForNumericObservations;
+import org.openmrs.module.pcslabinterface.rules.ConvertPV1ToPD1;
 import org.openmrs.module.pcslabinterface.rules.RemoveCommasFromHIVViralLoads;
 import org.openmrs.module.pcslabinterface.rules.RemoveConfirmationNullValueSegments;
 import org.openmrs.module.pcslabinterface.rules.RemoveDNAPCRNullValueSegments;
-import org.openmrs.module.pcslabinterface.rules.RemovePV1Segment;
 import org.openmrs.module.pcslabinterface.rules.RemoveValueModifiersFromHIVViralLoads;
 import org.openmrs.module.pcslabinterface.rules.TransformRule;
 
@@ -50,7 +50,7 @@ public class PcsLabInterfaceConstants {
 					new AdjustNegativeConceptForUrineProtein(),
 					new RemoveDNAPCRNullValueSegments(),
 					new RemoveConfirmationNullValueSegments(),
-					new RemovePV1Segment()
+					new ConvertPV1ToPD1()
 			};
 		return rules;
 	}
