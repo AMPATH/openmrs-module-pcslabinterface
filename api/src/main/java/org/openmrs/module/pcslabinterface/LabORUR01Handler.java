@@ -43,6 +43,7 @@ import ca.uhn.hl7v2.model.v25.segment.NK1;
 import ca.uhn.hl7v2.model.v25.segment.OBR;
 import ca.uhn.hl7v2.model.v25.segment.OBX;
 import ca.uhn.hl7v2.model.v25.segment.ORC;
+import ca.uhn.hl7v2.model.v25.segment.PD1;
 import ca.uhn.hl7v2.model.v25.segment.PID;
 import ca.uhn.hl7v2.model.v25.segment.PV1;
 import ca.uhn.hl7v2.parser.EncodingCharacters;
@@ -135,6 +136,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * @should create an encounter with no encounter type if none is provided
 	 * @should not create an encounter if no PV1 segment is in the message
 	 * @should throw an HL7Exception if a null value is in OBX5
+	 * @should look for provider and location in PD1 segment
 	 */
 	public Message processMessage(Message message) throws ApplicationException {
 
@@ -176,7 +178,6 @@ public class LabORUR01Handler extends ORUR01Handler {
 		MSH msh = getMSH(oru);
 		PID pid = getPID(oru);
 		List<NK1> nk1List = getNK1List(oru);
-		PV1 pv1 = getPV1(oru);
 		ORC orc = getORC(oru);
 		// we're using the ORC assoc with first OBR to hold data enterer and
 		// date entered for now
@@ -196,11 +197,11 @@ public class LabORUR01Handler extends ORUR01Handler {
 			log.debug("Processing HL7 message for patient " + patient.getPatientId());
 
 		// create an encounter
-		Encounter encounter = createEncounter(msh, patient, pv1, orc);
+		Encounter encounter = createEncounter(msh, patient, oru, orc);
 
 		// do the discharge to location logic
 		try {
-			updateHealthCenter(patient, pv1);
+			updateHealthCenter(patient, oru);
 		} catch (Exception e) {
 			log.error("Error while processing Discharge To Location (" + messageControlId + ")", e);
 		}
@@ -555,6 +556,10 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return oru.getPATIENT_RESULT().getPATIENT().getVISIT().getPV1();
 	}
 
+	private PD1 getPD1(ORU_R01 oru) {
+		return oru.getPATIENT_RESULT().getPATIENT().getPD1();
+	}
+
 	private ORC getORC(ORU_R01 oru) {
 		return oru.getPATIENT_RESULT().getORDER_OBSERVATION().getORC();
 	}
@@ -564,7 +569,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * created after all obs have been attached to it Creates an encounter pojo to be attached
 	 * later. This method does not create an encounterId
 	 */
-	private Encounter createEncounter(MSH msh, Patient patient, PV1 pv1, ORC orc) throws HL7Exception {
+	private Encounter createEncounter(MSH msh, Patient patient, ORU_R01 oru, ORC orc) throws HL7Exception {
+
+		PV1 pv1 = getPV1(oru);
 
 		// get the referenced encounterId if it is in the PV1 segment
 		Integer encounterId = null;
@@ -591,8 +598,8 @@ public class LabORUR01Handler extends ORUR01Handler {
 			encounter = new Encounter();
 
 			Date encounterDate = getEncounterDate(pv1);
-			Person provider = getProvider(pv1);
-			Location location = getLocation(pv1);
+			Person provider = getProvider(oru);
+			Location location = getLocation(oru);
 			Form form = getForm(msh);
 			EncounterType encounterType = getEncounterType(msh, form);
 			User creator = getEnterer(orc);
@@ -1001,6 +1008,19 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return Context.getService(PcsLabInterfaceService.class).getProviderBySystemId(systemId);
 	}
 
+	private Person getProvider(ORU_R01 oru) throws HL7Exception {
+		// prefer PV1
+		PV1 pv1 = getPV1(oru);
+		Person provider = getProvider(pv1);
+		if (provider != null) {
+			return provider;
+		}
+		// try PD1 if not found in PV1
+//		PD1 pd1 = getPD1(oru);
+//		return getProvider(pd1);
+		return null;
+	}
+
 	private Person getProvider(PV1 pv1) throws HL7Exception {
 		if (pv1.getAttendingDoctor().length == 0)
 			return null;
@@ -1041,15 +1061,29 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return Context.getHL7Service().resolvePersonFromIdentifiers(nk1.getNextOfKinAssociatedPartySIdentifiers());
 	}
 
-	private Location getLocation(PV1 pv1) throws HL7Exception {
-		PL hl7Location = pv1.getAssignedPatientLocation();
+	private Location getLocation(ORU_R01 oru) throws HL7Exception {
+		Integer locationId = null;
 
-		if (hl7Location.getPointOfCare().getValue() == null)
+		// try PV1 first
+		PV1 pv1 = getPV1(oru);
+		PL hl7Location = pv1.getAssignedPatientLocation();
+		if (hl7Location.getPointOfCare().getValue() != null) {
+			locationId = Context.getHL7Service().resolveLocationId(hl7Location);
+		}
+
+		// try PD1 second
+		if (locationId == null) {
+			PD1 pd1 = getPD1(oru);
+			if (pd1.getPatientPrimaryFacility().length > 0) {
+				locationId = Integer.parseInt(pd1.getPatientPrimaryFacility(0).getIDNumber().getValue());
+			}
+		}
+
+		// give up easily if nothing found
+		if (locationId == null)
 			return null;
 
-		Integer locationId = Context.getHL7Service().resolveLocationId(hl7Location);
-		if (locationId == null)
-			throw new HL7Exception("Could not resolve location");
+		// return a shell location
 		Location location = new Location();
 		location.setLocationId(locationId);
 		return location;
@@ -1130,7 +1164,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return conceptProposal;
 	}
 
-	private void updateHealthCenter(Patient patient, PV1 pv1) {
+	private void updateHealthCenter(Patient patient, ORU_R01 oru) {
+		PV1 pv1 = getPV1(oru);
+
 		// Update patient's location if it has changed
 		if (log.isDebugEnabled())
 			log.debug("Checking for discharge to location");

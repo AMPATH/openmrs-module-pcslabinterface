@@ -297,4 +297,32 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 		Message hl7message = parser.parse(hl7string);
 		router.processMessage(hl7message);
 	}
+
+	/**
+	 * @verifies look for provider and location in PD1 segment
+	 * @see LabORUR01Handler#processMessage(ca.uhn.hl7v2.model.Message)
+	 */
+	@Test
+	public void processMessage_shouldLookForProviderAndLocationInPD1Segment() throws Exception {
+		String hl7string = "MSH|^~\\&|PCSLABPLUS|PCS|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||\r"
+				+ "PID|||3^^^^L||John3^Doe^\r"
+				+ "PD1|||Unknown Location^D^1^^^AMRS^L^AMPATH|1^Super User (1-8)\r"
+				+ "ORC|RE||||||||20080226102537|1^Super User\r"
+				+ "OBR|1|||1238^MEDICAL RECORD OBSERVATIONS^99DCT\r"
+				+ "OBX|1|DT|5096^RETURN VISIT DATE^99DCT||20080229|||||||||20080212";
+
+		Message hl7message = parser.parse(hl7string);
+		router.processMessage(hl7message);
+
+		// get observations
+		Patient patient = new Patient(3);
+		List<Obs> observations = Context.getObsService().getObservationsByPerson(patient);
+		assertNotNull(observations);
+		assertEquals(1, observations.size());
+
+		// check provider and location on obs
+		Obs o = observations.get(0);
+		assertNotNull(o.getLocation());
+		assertEquals(new Integer(1), o.getLocation().getId());
+	}
 }
