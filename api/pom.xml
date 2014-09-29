@@ -3,7 +3,7 @@
 	<parent>
 		<groupId>org.openmrs.module</groupId>
 		<artifactId>pcslabinterface</artifactId>
-		<version>0.5.2</version>
+		<version>1.0-SNAPSHOT</version>
 	</parent>
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>pcslabinterface-api</artifactId>
