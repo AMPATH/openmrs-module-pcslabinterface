@@ -47,13 +47,18 @@ public abstract class AdjustNegativeConcept extends RegexTransformRule {
 		if (!m.matches())
 			return test;
 
-		// replace first occurrence of value with newValue
-		test = test.replaceFirst("\\^Negative\\^99DCT", "664^NEGATIVE^99DCT");
+		// replace all occurrence of value with newValue
+        m.reset();
+        StringBuffer sb = new StringBuffer(test);
+        while(m.find()){
+            sb = sb.replace(m.start(1),m.end(1),"664^NEGATIVE^99DCT");
+        }
+        System.out.println(sb);
 
 		// append a comment describing the change
-		return test.concat(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
-				.concat("NTE|||")
-				.concat(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
-				.concat("^Negative^99DCT");
+		return sb.append(PcsLabInterfaceConstants.MESSAGE_EOL_SEQUENCE)
+				.append("NTE|||")
+				.append(PcsLabInterfaceConstants.LAB_VALUE_MODIFIED)
+				.append("^Negative^99DCT").toString();
 	}
 }
