@@ -18,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 public class PcsLabInterfaceQueueProcessorTest extends BaseModuleContextSensitiveTest {
 
 	protected static final String ORU_INITIAL_DATA_XML = "org/openmrs/hl7/include/ORUTest-initialData.xml";
-	protected static final String SAMPLE_HL7_PATH = "org/openmrs/module/pcslabinterface/test/include/sample.hl7";
+	protected static final String SAMPLE_HL7_PATH = "include/sample.hl7";
 
 	/**
 	 * @see {@link PcsLabInterfaceQueueProcessor#preProcessMessage(String)}
