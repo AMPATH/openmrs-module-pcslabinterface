@@ -5,7 +5,9 @@ import org.junit.Test;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
 import org.openmrs.test.Verifies;
 
-public class AdjustNegativeConceptForUrineProteinTest {
+import java.util.regex.Matcher;
+
+public class AdjustNegativeConceptTest {
 
     /**
 	 * @see {@link AdjustNegativeConceptForUrineProtein#transform(java.lang.String)
@@ -22,8 +24,7 @@ public class AdjustNegativeConceptForUrineProteinTest {
 				+ PcsLabInterfaceConstants.LAB_VALUE_MODIFIED
 				+ "^Negative^99DCT";
 
-        String actual = new AdjustNegativeConceptForUrineProtein().transform(hl7string);
-
+        String actual = new AdjustNegativeConcept(){}.transform(hl7string);
 		Assert.assertEquals(expected, actual);
 	}
 
@@ -35,7 +36,7 @@ public class AdjustNegativeConceptForUrineProteinTest {
 	public void transform_shouldNotReplaceProperConceptReference()
 			throws Exception {
 		String hl7string = "OBX|1|CWE|2339^URINE Protein^99DCT||664^NEGATIVE^99DCT|||||||||20080206";
-        String actual = new AdjustNegativeConceptForUrineProtein().transform(hl7string);
+        String actual = new AdjustNegativeConcept(){}.transform(hl7string);
 		Assert.assertEquals(hl7string, actual);
 	}
 }
