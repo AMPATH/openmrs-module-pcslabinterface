@@ -46,3 +46,5 @@ local.properties
 # PDT-specific
 .buildpath
 
+#exclude library.
+lib/*
