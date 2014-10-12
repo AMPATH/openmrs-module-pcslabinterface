@@ -102,7 +102,7 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		return messages;
 	}
 
-	public void deleteLabMessage(LabMessage labMessage) {
+	public void deleteLabMessage(LabMessage labMessage){
 
 		if ((labMessage == null) || (labMessage.getFileSystemUrl() == null)) {
 			throw new PcsLabInterfaceException(
@@ -111,14 +111,24 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		File file = new File(labMessage.getFileSystemUrl());
 		log.debug("file path is " + file.getAbsolutePath());
 		if (file.exists()) {
+            String deleteError = "Unable to delete file from queue: " + file.getAbsolutePath();
 			// TODO: move file to an archive, not delete it
-
-			if (!file.delete())
-				throw new PcsLabInterfaceException(
-						"Unable to delete file from queue: "
-								+ file.getAbsolutePath()
-								+ " -- check file and folder write permissions");
-		}
+            try{
+                Process p=Runtime.getRuntime().exec("rm -f "+file.getAbsolutePath());
+                if(p.waitFor()==0){
+                    log.debug("File deleted "+file.getAbsolutePath());
+                }
+            }
+            catch (SecurityException se){
+				throw new PcsLabInterfaceException(deleteError
+								+ " -- check file and folder write permissions"
+                                + se.getMessage());
+            }catch (IOException ioe){
+                throw new PcsLabInterfaceException(deleteError+ioe.getMessage());
+            } catch (InterruptedException e){
+                log.error("Unable to delete file from queue: ",e);
+            }
+        }
 	}
 
 	/**
