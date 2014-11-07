@@ -237,6 +237,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 		List<List<Obs>> valueGroups = new ArrayList<List<Obs>>();
 
 		ORU_R01_PATIENT_RESULT patientResult = oru.getPATIENT_RESULT();
+
 		int numObr = patientResult.getORDER_OBSERVATIONReps();
 		for (int i = 0; i < numObr; i++) {
 			if (log.isDebugEnabled())
@@ -260,7 +261,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 				obsGrouper.setEncounter(encounter);
 				Date datetime = getDatetime(obr);
 				if (datetime == null)
-					datetime = encounter.getEncounterDatetime();
+                    datetime = getDateTime(getORC(oru));
+                if(datetime == null) datetime = getDatetime(msh.getDateTimeOfMessage());
+                if(datetime == null) datetime = new Date();
 				obsGrouper.setObsDatetime(datetime);
 				obsGrouper.setLocation(encounter.getLocation());
 				obsGrouper.setCreator(encounter.getCreator());
@@ -295,9 +298,10 @@ public class LabORUR01Handler extends ORUR01Handler {
 					log.debug("Parsing observation");
 					List<Obs> obses = parseObs(encounter, obx, obr, messageControlId);
 
-					// throw an error if no value was found
+					// Do not include the obs if not found
 					if (obses == null) {
-						throw new HL7Exception("null value in OBX-5");
+//						throw new HL7Exception("null value in OBX-5");
+                        continue;
 					}
 
 					// initialize and increment value group id counters
@@ -415,9 +419,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 		// save each obs but not the encounter object
 		// can't use getAllObs() method here because of how cascade saving is done
 		for (Obs obs : encounter.getObsAtTopLevel(false)) {
-			recursivelySetEncounter(obs, null);
+			nullifyObsEncounter(obs);
 			// the changeMessage here is not used
-			Context.getObsService().saveObs(obs, "new stand-alone observation from orur01 handler");
+            Context.getObsService().saveObs(obs, "new stand-alone observation from orur01 handler");
 		}
 	}
 
@@ -443,7 +447,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			throw new HL7Exception("Relationship type '" + relIdentifier + "' improperly formed in NK1 segment.");
 
 		// get the type ID
-		Integer relTypeId = 0;
+		Integer relTypeId;
 		try {
 			relTypeId = Integer.parseInt(relIdentifier.substring(0, relIdentifier.length() - 1));
 		} catch (NumberFormatException e) {
@@ -514,6 +518,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 				recursivelySetEncounter(childObs, encounter);
 	}
 
+    private void nullifyObsEncounter(final Obs obs) {
+        recursivelySetEncounter(obs,null);
+    }
 	/**
 	 * Validates an encounter
 	 */
@@ -602,11 +609,11 @@ public class LabORUR01Handler extends ORUR01Handler {
 			Location location = getLocation(oru);
 			Form form = getForm(msh);
 			EncounterType encounterType = getEncounterType(msh, form);
-			User creator = getEnterer(orc);
+            User creator = getEnterer(orc);
 			//			Date dateEntered = getDateEntered(orc); // ignore this since we have no place in the data model to store it
 
 			encounter.setEncounterDatetime(encounterDate);
-			encounter.setProvider(provider);
+            if(provider != null) encounter.setProvider(provider);
 			encounter.setPatient(patient);
 			encounter.setLocation(location);
 			encounter.setForm(form);
@@ -949,7 +956,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			// the concept is local
 			try {
 				Integer conceptId = new Integer(hl7ConceptId);
-				return new Concept(conceptId);
+                return Context.getConceptService().getConcept(conceptId);
 			} catch (NumberFormatException e) {
 				throw new HL7Exception("Invalid concept ID '" + hl7ConceptId + "' in hl7 message with uid: " + uid);
 			}
@@ -975,11 +982,16 @@ public class LabORUR01Handler extends ORUR01Handler {
 	 * Pull the timestamp for this obr out. if an invalid date is found, null is returned
 	 */
 	private Date getDatetime(OBR obr) throws HL7Exception {
+        if(obr==null) return null;
 		TS ts = obr.getObservationDateTime();
 		return getDatetime(ts);
-
 	}
 
+    private Date getDateTime(ORC orc) throws HL7Exception {
+        if(orc==null) return null;
+        TS ts = orc.getDateTimeOfTransaction();
+        return getDatetime(ts);
+    }
 	/**
 	 * Return a java date object for the given TS
 	 */
@@ -1123,13 +1135,18 @@ public class LabORUR01Handler extends ORUR01Handler {
 	private EncounterType getEncounterType(MSH msh, Form form) {
 		if (form != null)
 			return form.getEncounterType();
-		// TODO: resolve encounter type from MSH data - do we need PV1 too?
+		// TODO: resolve encounter type from MSH data
 		return null;
 	}
 
 	private User getEnterer(ORC orc) throws HL7Exception {
 		XCN hl7Enterer = orc.getEnteredBy(0);
-		Integer entererId = Context.getHL7Service().resolveUserId(hl7Enterer);
+        String idNumber = hl7Enterer.getIDNumber().getValue();
+        String familyName = hl7Enterer.getFamilyName().getSurname().getValue();
+        String giveName = hl7Enterer.getGivenName().getValue();
+        if(idNumber==null && familyName==null && giveName==null) return null;
+        if(idNumber.length()==0 && familyName.length()==0 & giveName.length()==0) return null;
+        Integer entererId = Context.getHL7Service().resolveUserId(hl7Enterer);
 		if (entererId == null)
 			throw new HL7Exception("Could not resolve enterer");
 		User enterer = new User();
