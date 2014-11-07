@@ -1009,33 +1009,50 @@ public class LabORUR01Handler extends ORUR01Handler {
 	}
 
 	private Person getProvider(ORU_R01 oru) throws HL7Exception {
-		// prefer PV1
-		PV1 pv1 = getPV1(oru);
-		Person provider = getProvider(pv1);
+		// prefer PD1
+        Person provider = getProvider(getPD1(oru));
 
-		// TODO add logic here to find it from the PD1
+        if(provider == null) {      //Try PV1
+            provider = getProvider(getPV1(oru));
+        }
+
 		return provider;
 	}
 
 	private Person getProvider(PV1 pv1) throws HL7Exception {
+        if(pv1==null) return null;
 		if (pv1.getAttendingDoctor().length == 0)
 			return null;
 
-		XCN hl7Provider = pv1.getAttendingDoctor(0);
-
-		// PCS sends systemIds for provider identifier
-		String identifier = hl7Provider.getIDNumber().getValue();
-		if (identifier.matches("\\d+-\\d")) {
-			return getProviderBySystemId(identifier);
-		}
-
-		Integer providerId = Context.getHL7Service().resolvePersonId(hl7Provider);
-		if (providerId == null)
-			throw new HL7Exception("Could not resolve provider");
-		Person provider = new Person(providerId);
-
-		return provider;
+        return getProvider(pv1.getAttendingDoctor(0));
 	}
+
+    private Person getProvider(PD1 pd1) throws HL7Exception {
+        if(pd1==null) return null;
+        if(pd1.getPatientPrimaryCareProviderNameIDNo().length==0){
+            return null;
+        }
+
+        //Get the first one (Usually there is only one anyway)
+        return getProvider(pd1.getPatientPrimaryCareProviderNameIDNo(0));
+    }
+
+    private Person getProvider(XCN hl7Provider) throws HL7Exception {
+        if(hl7Provider==null) return null;
+
+        // PCS sends systemIds for provider identifier
+        String identifier = hl7Provider.getIDNumber().getValue();
+        if (identifier.matches("\\d+-\\d")) {
+            return getProviderBySystemId(identifier);
+        }
+
+        Integer providerId = Context.getHL7Service().resolvePersonId(hl7Provider);
+        if (providerId == null)
+            throw new HL7Exception("Could not resolve provider");
+        Person provider = new Person(providerId);
+
+        return provider;
+    }
 
 	private Patient getPatient(PID pid) throws HL7Exception {
 		Integer patientId = Context.getHL7Service().resolvePatientId(pid);
