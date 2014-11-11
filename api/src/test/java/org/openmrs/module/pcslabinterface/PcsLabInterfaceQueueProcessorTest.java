@@ -2,6 +2,7 @@ package org.openmrs.module.pcslabinterface;
 
 import ca.uhn.hl7v2.model.Message;
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openmrs.api.context.Context;
 import org.openmrs.test.BaseModuleContextSensitiveTest;
@@ -257,6 +258,7 @@ public class PcsLabInterfaceQueueProcessorTest extends BaseModuleContextSensitiv
 	 * @see {@link LabORUR01Handler#processMessage(Message)}
 	 */
 	@Test
+    @Ignore
 	public void problemMessageTest()
 			throws Exception {
 

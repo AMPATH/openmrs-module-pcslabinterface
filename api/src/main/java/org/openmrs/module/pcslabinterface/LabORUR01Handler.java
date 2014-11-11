@@ -74,7 +74,11 @@ import org.openmrs.hl7.handler.ORUR01Handler;
 import org.openmrs.hl7.handler.ProposingConceptException;
 import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
+import org.openmrs.validator.ObsValidator;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.Errors;
+import org.springframework.validation.Validator;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -218,20 +222,6 @@ public class LabORUR01Handler extends ORUR01Handler {
 		// create observations
 		if (log.isDebugEnabled())
 			log.debug("Creating observations for message " + messageControlId + "...");
-		// we ignore all MEDICAL_RECORD_OBSERVATIONS that are OBRs.  We do not
-		// create obs_groups for them
-		List<Concept> ignoredConcepts = new ArrayList<Concept>();
-
-		String ignoreOBRConceptId = Context.getAdministrationService().getGlobalProperty(
-				OpenmrsConstants.GLOBAL_PROPERTY_MEDICAL_RECORD_OBSERVATIONS, "1238");
-		if (ignoreOBRConceptId.length() > 0)
-			ignoredConcepts.add(new Concept(Integer.valueOf(ignoreOBRConceptId)));
-
-		// we also ignore all PROBLEM_LIST that are OBRs
-		ignoreOBRConceptId = Context.getAdministrationService().getGlobalProperty(
-				OpenmrsConstants.GLOBAL_PROPERTY_PROBLEM_LIST, "1284");
-		if (ignoreOBRConceptId.length() > 0)
-			ignoredConcepts.add(new Concept(Integer.valueOf(ignoreOBRConceptId)));
 
 		// keep a list of obses that need value reference ids
 		List<List<Obs>> valueGroups = new ArrayList<List<Obs>>();
@@ -251,7 +241,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			// Obs grouper object that the underlying obs objects will use
 			Obs obsGrouper = null;
 			Concept obrConcept = getConcept(obr.getUniversalServiceIdentifier(), messageControlId);
-			if (obrConcept != null && !ignoredConcepts.contains(obrConcept)) {
+            if (obrConcept != null && !PcsLabInterfaceUtil.isObrConceptIgnored(obrConcept)) {
 				// maybe check for a parent obs group from OBR-29 Parent ?
 
 				// create an obs for this obs group too
@@ -312,6 +302,15 @@ public class LabORUR01Handler extends ORUR01Handler {
 					// process each obs
 					for (Obs obs : obses) {
 						if (obs != null) {
+                            //Validate the obs
+                            Validator validator = new ObsValidator();
+                            Errors errors = new BeanPropertyBindingResult(obs,"obs");
+                            validator.validate(obs,errors);
+                            if(errors.hasErrors()) {
+                                throw new HL7Exception("Error(s) in obs associated with OBX: "
+                                        + PipeParser.encode(obx, new EncodingCharacters('|', "^~\\&"))
+                                        + errors.getAllErrors().toString());
+                            }
 							// if we're backfilling an encounter, don't use
 							// the creator/dateCreated from the encounter
 							if (encounter.getEncounterId() != null) {
@@ -348,7 +347,8 @@ public class LabORUR01Handler extends ORUR01Handler {
 					}
 
 				} catch (HL7Exception e) {
-					errorInHL7Queue = e;
+//					errorInHL7Queue = e;
+                    throw e;
 				} finally {
 					// Handle obs-level exceptions
 					if (errorInHL7Queue != null) {
@@ -953,16 +953,15 @@ public class LabORUR01Handler extends ORUR01Handler {
 	protected Concept getConcept(String hl7ConceptId, String codingSystem, String uid) throws HL7Exception {
 		if (OpenmrsUtil.nullSafeEquals(HL7Constants.HL7_LOCAL_CONCEPT,
 				codingSystem)) {
-			// the concept is local
+            // the concept is local
 			try {
-				Integer conceptId = new Integer(hl7ConceptId);
-                return Context.getConceptService().getConcept(conceptId);
+                return Context.getConceptService().getConcept(Integer.valueOf(hl7ConceptId));
 			} catch (NumberFormatException e) {
 				throw new HL7Exception("Invalid concept ID '" + hl7ConceptId + "' in hl7 message with uid: " + uid);
 			}
 		} else {
 			// the concept is not local, look it up in our mapping
-			Concept concept = Context.getConceptService().getConceptByMapping(hl7ConceptId, codingSystem);
+            Concept concept = Context.getConceptService().getConceptByMapping(hl7ConceptId, codingSystem);
 			if (concept == null)
 				log.error("Unable to find concept with code: " + hl7ConceptId + " and mapping: " + codingSystem
 						+ " in hl7 message with uid: " + uid);

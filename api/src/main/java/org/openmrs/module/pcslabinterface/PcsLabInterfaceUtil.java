@@ -18,17 +18,38 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
+import java.util.*;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.openmrs.Concept;
 import org.openmrs.User;
 import org.openmrs.api.AdministrationService;
 import org.openmrs.api.context.Context;
+import org.openmrs.util.OpenmrsConstants;
 import org.openmrs.util.OpenmrsUtil;
+import org.springframework.util.StringUtils;
 
 public class PcsLabInterfaceUtil {
 	private static Log log = LogFactory.getLog(PcsLabInterfaceUtil.class);
+
+
+    // we ignore all MEDICAL_RECORD_OBSERVATIONS that are OBRs.  We do not
+    // create obs_groups for them
+    private static final List<Concept> ignoredConcepts = new ArrayList<Concept>();
+
+    static {
+        String ignoreOBRConceptId = Context.getAdministrationService().getGlobalProperty(
+                OpenmrsConstants.GLOBAL_PROPERTY_MEDICAL_RECORD_OBSERVATIONS, "1238");
+        if (ignoreOBRConceptId.length() > 0)
+            ignoredConcepts.add(Context.getConceptService().getConcept(Integer.valueOf(ignoreOBRConceptId)));
+
+        // we also ignore all PROBLEM_LIST that are OBRs
+        ignoreOBRConceptId = Context.getAdministrationService().getGlobalProperty(
+                OpenmrsConstants.GLOBAL_PROPERTY_PROBLEM_LIST, "1284");
+        if (ignoreOBRConceptId.length() > 0)
+            ignoredConcepts.add(Context.getConceptService().getConcept(Integer.valueOf(ignoreOBRConceptId)));
+    }
 
 	/**
 	 * Cached directory where queue items are stored
@@ -194,4 +215,8 @@ public class PcsLabInterfaceUtil {
 
 		writer.close();
 	}
+
+    public static boolean isObrConceptIgnored(final Concept concept) {
+        return ignoredConcepts.contains(concept);
+    }
 }

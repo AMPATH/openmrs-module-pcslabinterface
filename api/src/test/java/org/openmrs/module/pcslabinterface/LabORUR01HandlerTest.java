@@ -36,6 +36,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 
 	// test data to load before all tests (from OpenMRS core)
 	protected static final String ORU_INITIAL_DATA_XML = "org/openmrs/hl7/include/ORUTest-initialData.xml";
+    protected static final String PCS_TEST_DATA_XML = "PCS_test_data.xml";
 
 	// hl7 parser for all tests
 	protected static GenericParser parser = new GenericParser();
@@ -57,6 +58,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 	@Before
 	public void runBeforeEachTest() throws Exception {
 		executeDataSet(ORU_INITIAL_DATA_XML);
+        executeDataSet(PCS_TEST_DATA_XML);
 	}
 
 	/**
@@ -365,5 +367,22 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
         List<Obs> observations = Context.getObsService().getObservationsByPerson(patient);
         assertNotNull(observations);
         assertEquals(0, observations.size());
+    }
+
+    @Test
+    public void processMessage_shouldNotCreateObsGroupForOBRWithConceptID1238() throws Exception {
+        String hl7string = "MSH|^~\\&|EID|AMPATHLAB|HL7LISTENER|AMRS|20140809||ORU^R01|EID20141010163451-33863|P|2.5|1||||||||\r"
+                + "PID|||3^^^^L||John3^Doe^\r"
+                + "OBR|1|||1238^MEDICAL RECORD OBSERVATIONS^99DCT\r"
+                + "OBX|1|NM|856^HIV Viral Load^99DCT||43.5|^copies/ml|||||F|||20140607\r"
+                + "NTE|||PCS Value: < LDL copies/ml";
+
+        Message hl7Message = parser.parse(hl7string);
+        router.processMessage(hl7Message);
+
+        Patient patient = new Patient(3);
+        Concept concept = new Concept(1238);
+        List<Obs> obs = Context.getObsService().getObservationsByPersonAndConcept(patient,concept);
+        assertTrue(obs.isEmpty());
     }
 }
