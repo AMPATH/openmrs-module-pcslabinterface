@@ -3,7 +3,7 @@
 
 	<groupId>org.openmrs.module</groupId>
 	<artifactId>pcslabinterface</artifactId>
-	<version>1.0.4</version>
+	<version>1.0.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>PcsLabInterface</name>
 	<description>Parent project for PcsLabInterface</description>
