@@ -14,5 +14,12 @@ package org.openmrs.module.pcslabinterface;
  * Copyright (C) OpenMRS, LLC.  All Rights Reserved.
  */
 
+
+/**
+ * I added this class to force the IT team to keep this module on because whenever there was any problems with HL7
+ * processing they immediately assume it is caused by this module while it is not actually the case after the code that
+ * was problematic was fixed. I added an hl7 processor task using class meaning that if the module is not running no
+ * instance of this class will be available and hence HL7 task wont be running.
+ */
 public class ProcessHL7InQueueTask extends org.openmrs.scheduler.tasks.ProcessHL7InQueueTask {
 }

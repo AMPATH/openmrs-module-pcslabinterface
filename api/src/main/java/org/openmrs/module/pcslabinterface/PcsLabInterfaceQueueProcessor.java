@@ -45,25 +45,30 @@ public class PcsLabInterfaceQueueProcessor {
 		HL7InQueue hl7InQueue = new HL7InQueue();
 
 		// pre-process the HL7 message
+
 		String hl7Message = preProcessMessage(labMessage.getData());
-		hl7InQueue.setHL7Data(hl7Message);
+        if(hl7Message!=null && hl7Message.length()>0) {   //Process non blank files only
+            hl7InQueue.setHL7Data(hl7Message);
 
-		// TODO: do something better than this for choosing HL7Source
-		hl7InQueue.setHL7Source(Context.getHL7Service().getHL7Source(
-				Integer.valueOf(1)));
+            // TODO: do something better than this for choosing HL7Source
+            hl7InQueue.setHL7Source(Context.getHL7Service().getHL7Source(
+                    Integer.valueOf(1)));
 
-		// generate the source key
-		String hl7SourceKey = String.valueOf(labMessage.getLabMessageId());
+            // generate the source key
+            String hl7SourceKey = String.valueOf(labMessage.getLabMessageId());
 
-		// if possible, extract the source key from the lab message
-		// TODO use an HL7 parser to find it
-		Matcher m = keyPattern.matcher(labMessage.getData());
-		if (m.find())
-			hl7SourceKey = m.group(1);
-		hl7InQueue.setHL7SourceKey(hl7SourceKey);
+            // if possible, extract the source key from the lab message
+            // TODO use an HL7 parser to find it
+            Matcher m = keyPattern.matcher(labMessage.getData());
+            if (m.find())
+                hl7SourceKey = m.group(1);
+            hl7InQueue.setHL7SourceKey(hl7SourceKey);
 
-		// save the HL7 message
-		Context.getHL7Service().saveHL7InQueue(hl7InQueue);
+            // save the HL7 message
+            Context.getHL7Service().saveHL7InQueue(hl7InQueue);
+        }  else {
+           log.warn("The file: "+ labMessage.getFileSystemUrl() +" might be blank!");
+        }
 
 		// archive the queue
 		PcsLabInterfaceService pcsService = (PcsLabInterfaceService) Context
@@ -135,8 +140,7 @@ public class PcsLabInterfaceQueueProcessor {
 		boolean transformOccurred = false;
 		PcsLabInterfaceService pcsService = null;
 		try {
-			pcsService = (PcsLabInterfaceService) Context
-					.getService(PcsLabInterfaceService.class);
+			pcsService = Context.getService(PcsLabInterfaceService.class);
 		} catch (APIException e) {
 			log.debug("PcsLabInterfaceService not found");
 			return false;
