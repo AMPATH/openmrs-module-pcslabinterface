@@ -6,6 +6,8 @@ package org.openmrs.module.pcslabinterface.db;
 
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hibernate.Criteria;
 import org.hibernate.SessionFactory;
 import org.hibernate.criterion.Projections;
@@ -13,13 +15,14 @@ import org.hibernate.criterion.Restrictions;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Person;
 import org.openmrs.User;
+import org.openmrs.api.context.Context;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceDAO;
 
 /**
  * @author jkeiper
  */
 public class HibernatePcsLabInterfaceDAO implements PcsLabInterfaceDAO {
-
+     private static Log log = LogFactory.getLog(HibernatePcsLabInterfaceDAO.class);
 	/**
 	 * the session factory to use in this DAO
 	 */

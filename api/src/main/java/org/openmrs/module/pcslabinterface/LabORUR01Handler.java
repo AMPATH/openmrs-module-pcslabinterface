@@ -120,7 +120,9 @@ public class LabORUR01Handler extends ORUR01Handler {
 			// TODO remove these tests when we are ready to handle all ORU^R01 messages
 			// check for special indicators
 
-			if (!StringUtils.hasLength(sendingApplication))
+            log.debug(oru.getMSH()+" Sending application is: "+ sendingApplication);
+
+            if (!StringUtils.hasLength(sendingApplication))
 				return false;
 
 			if (allowedSendingApps.contains(sendingApplication.toLowerCase()))
