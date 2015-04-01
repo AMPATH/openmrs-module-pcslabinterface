@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import org.openmrs.Person;
+import org.openmrs.Provider;
 import org.openmrs.annotation.Authorized;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -82,5 +83,5 @@ public abstract interface PcsLabInterfaceService {
 	public List<Integer> getNumericConceptIds();
 
 	@Transactional(readOnly = true)
-	public Person getProviderBySystemId(String systemId);
+	public Provider getProviderBySystemId(String systemId);
 }

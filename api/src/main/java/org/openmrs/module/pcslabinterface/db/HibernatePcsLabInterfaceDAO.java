@@ -14,6 +14,7 @@ import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.openmrs.ConceptNumeric;
 import org.openmrs.Person;
+import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.api.context.Context;
 import org.openmrs.module.pcslabinterface.PcsLabInterfaceDAO;
@@ -38,12 +39,29 @@ public class HibernatePcsLabInterfaceDAO implements PcsLabInterfaceDAO {
 		return crit.list();
 	}
 
-	public Person getProviderBySystemId(String systemId) {
+	public Provider getProviderBySystemId(String systemId) {
 		Criteria crit = sessionFactory.getCurrentSession().createCriteria(User.class)
 				.add(Restrictions.eq("systemId", systemId))
 				.setProjection(Projections.property("person"));
 
-		return (Person) crit.uniqueResult();
+        Person person = (Person)crit.uniqueResult();
+        Provider provider = null;
+        //Confirm if there is a provider associated with this person
+
+        if(person != null) {
+            try {
+                List<Provider> providers = (List<Provider>)Context.getProviderService().getProvidersByPerson(person);
+
+                //If it exists return the first provider
+                if(providers!=null && !providers.isEmpty()){
+                    provider = providers.get(0);
+                }
+
+            }catch (IllegalArgumentException ie) {
+                log.debug(ie.getMessage());
+            }
+        }
+        return provider;
 	}
 
 }

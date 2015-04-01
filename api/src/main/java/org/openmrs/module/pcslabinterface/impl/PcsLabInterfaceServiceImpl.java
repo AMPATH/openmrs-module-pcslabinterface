@@ -26,6 +26,7 @@ import java.util.Vector;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.openmrs.Person;
+import org.openmrs.Provider;
 import org.openmrs.User;
 import org.openmrs.api.APIAuthenticationException;
 import org.openmrs.api.context.Context;
@@ -245,7 +246,7 @@ public class PcsLabInterfaceServiceImpl implements PcsLabInterfaceService {
 		return dao.getNumericConceptIds();
 	}
 
-	public Person getProviderBySystemId(String systemId) {
+	public Provider getProviderBySystemId(String systemId) {
 		return dao.getProviderBySystemId(systemId);
 	}
 

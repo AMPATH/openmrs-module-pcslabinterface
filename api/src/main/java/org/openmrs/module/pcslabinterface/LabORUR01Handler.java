@@ -50,23 +50,7 @@ import ca.uhn.hl7v2.parser.EncodingCharacters;
 import ca.uhn.hl7v2.parser.PipeParser;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.openmrs.Concept;
-import org.openmrs.ConceptAnswer;
-import org.openmrs.ConceptName;
-import org.openmrs.ConceptProposal;
-import org.openmrs.Drug;
-import org.openmrs.Encounter;
-import org.openmrs.EncounterType;
-import org.openmrs.Form;
-import org.openmrs.Location;
-import org.openmrs.Obs;
-import org.openmrs.Patient;
-import org.openmrs.Person;
-import org.openmrs.PersonAttribute;
-import org.openmrs.PersonAttributeType;
-import org.openmrs.Relationship;
-import org.openmrs.RelationshipType;
-import org.openmrs.User;
+import org.openmrs.*;
 import org.openmrs.api.context.Context;
 import org.openmrs.hl7.HL7Constants;
 import org.openmrs.hl7.HL7Service;
@@ -607,7 +591,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			encounter = new Encounter();
 
 			Date encounterDate = getEncounterDate(pv1);
-			Person provider = getProvider(oru);
+			Provider provider = getProvider(oru);
 			Location location = getLocation(oru);
 			Form form = getForm(msh);
 			EncounterType encounterType = getEncounterType(msh, form);
@@ -615,7 +599,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			//			Date dateEntered = getDateEntered(orc); // ignore this since we have no place in the data model to store it
 
 			encounter.setEncounterDatetime(encounterDate);
-            if(provider != null) encounter.setProvider(provider);
+            if(provider != null) encounter.setProvider(null,provider);
 			encounter.setPatient(patient);
 			encounter.setLocation(location);
 			encounter.setForm(form);
@@ -1017,13 +1001,13 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return tsToDate(pv1.getAdmitDateTime());
 	}
 
-	private Person getProviderBySystemId(String systemId) {
+	private Provider getProviderBySystemId(String systemId) {
 		return Context.getService(PcsLabInterfaceService.class).getProviderBySystemId(systemId);
 	}
 
-	private Person getProvider(ORU_R01 oru) throws HL7Exception {
+	private Provider getProvider(ORU_R01 oru) throws HL7Exception {
 		// prefer PD1
-        Person provider = getProvider(getPD1(oru));
+        Provider provider = getProvider(getPD1(oru));
 
         if(provider == null) {      //Try PV1
             provider = getProvider(getPV1(oru));
@@ -1032,7 +1016,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return provider;
 	}
 
-	private Person getProvider(PV1 pv1) throws HL7Exception {
+	private Provider getProvider(PV1 pv1) throws HL7Exception {
         if(pv1==null) return null;
 		if (pv1.getAttendingDoctor().length == 0)
 			return null;
@@ -1040,7 +1024,7 @@ public class LabORUR01Handler extends ORUR01Handler {
         return getProvider(pv1.getAttendingDoctor(0));
 	}
 
-    private Person getProvider(PD1 pd1) throws HL7Exception {
+    private Provider getProvider(PD1 pd1) throws HL7Exception {
         if(pd1==null) return null;
         if(pd1.getPatientPrimaryCareProviderNameIDNo().length==0){
             return null;
@@ -1050,7 +1034,7 @@ public class LabORUR01Handler extends ORUR01Handler {
         return getProvider(pd1.getPatientPrimaryCareProviderNameIDNo(0));
     }
 
-    private Person getProvider(XCN hl7Provider) throws HL7Exception {
+    private Provider getProvider(XCN hl7Provider) throws HL7Exception {
         if(hl7Provider==null) return null;
 
         // PCS sends systemIds for provider identifier
@@ -1059,14 +1043,20 @@ public class LabORUR01Handler extends ORUR01Handler {
             return getProviderBySystemId(identifier);
         }
 
-        Integer providerId = Context.getHL7Service().resolvePersonId(hl7Provider);
-        if (providerId == null)
+        Integer personId = Context.getHL7Service().resolvePersonId(hl7Provider);
+        if (personId == null)
             throw new HL7Exception("Could not resolve provider");
-        Person provider = new Person(providerId);
 
-        return provider;
+        return getProviderByPersonId(personId);
     }
 
+    private Provider getProviderByPersonId(Integer personId) {
+        List<Provider> providers = (List<Provider>)Context.getProviderService().getProvidersByPerson(new Person(personId));
+        if(providers!=null && !providers.isEmpty()) {
+            return providers.get(0);
+        }
+        return null;
+    }
 	private Patient getPatient(PID pid) throws HL7Exception {
 		Integer patientId = Context.getHL7Service().resolvePatientId(pid);
 		if (patientId == null)
