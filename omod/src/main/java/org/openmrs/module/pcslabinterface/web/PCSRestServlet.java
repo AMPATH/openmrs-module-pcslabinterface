@@ -1,36 +1,30 @@
 package org.openmrs.module.pcslabinterface.web;
 
-import java.io.IOException;
-import java.net.URLDecoder;
-import java.util.Hashtable;
+import com.sun.org.apache.xml.internal.security.exceptions.Base64DecodingException;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.openmrs.api.APIAuthenticationException;
+import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
+import org.openmrs.module.pcslabinterface.web.resource.FindPatientResource;
+import org.openmrs.module.pcslabinterface.web.resource.PatientResource;
+import org.openmrs.module.pcslabinterface.web.resource.RestResource;
+import org.openmrs.module.pcslabinterface.web.resource.RestResource.Operation;
+import org.openmrs.module.pcslabinterface.web.resource.RestResource.OutputType;
+
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.util.Hashtable;
 
-import org.openmrs.api.APIAuthenticationException;
-import org.openmrs.module.pcslabinterface.PcsLabInterfaceConstants;
-import org.openmrs.module.restmodule.RestUtil;
-import org.openmrs.module.restmodule.web.FindPatientResource;
-import org.openmrs.module.restmodule.web.FindUserResource;
-import org.openmrs.module.restmodule.web.HL7MessageResource;
-import org.openmrs.module.restmodule.web.ObsResource;
-import org.openmrs.module.restmodule.web.PatientResource;
-import org.openmrs.module.restmodule.web.RestResource;
-import org.openmrs.module.restmodule.web.RestResource.Operation;
-import org.openmrs.module.restmodule.web.RestResource.OutputType;
-import org.openmrs.module.restmodule.web.UserResource;
-
-/**
- * This is a direct copy of the REST Module's RestServlet
- * 
- * TODO break out REST Module's handleRequest method to be overridden by
- * subclasses
- */
 public class PCSRestServlet extends HttpServlet {
 
 	private static final long serialVersionUID = 1L;
+    private static Log log = LogFactory.getLog(PCSRestServlet.class);
+    private static final String base64ErrorMessage = "Could not base64 decode input password ";
 
 	/**
 	 * Name for servlet within the servlet mapping (follows "/servletModule/" in
@@ -38,7 +32,6 @@ public class PCSRestServlet extends HttpServlet {
 	 */
 	public static final String SERVLET_NAME_API = "pcsapi";
 	public static final String SERVLET_NAME_JSON = "pcsjson";
-	public static final double OBS_LIST_XML_VERSION = 1.0;
 	public static final double PATIENT_LIST_XML_VERSION = 1.0;
 	/**
 	 * Internally held list of resources. Currently hardcoded.
@@ -47,52 +40,61 @@ public class PCSRestServlet extends HttpServlet {
 	static {
 		resources.put("patient", new PatientResource());
 		resources.put("findPatient", new FindPatientResource());
-		resources.put("user", new UserResource());
-		resources.put("findUser", new FindUserResource());
-		resources.put("obs", new ObsResource());
-		resources.put("hl7", new HL7MessageResource());
 	}
 
 	@Override
 	protected void doGet(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(Operation.GET, request, response);
-	}
+        try {
+            handleRequest(Operation.GET, request, response);
+        } catch (Base64DecodingException e) {
+            log.error(base64ErrorMessage + e.getMessage());
+        }
+    }
 
 	@Override
 	protected void doPost(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(Operation.POST, request, response);
-	}
+        try {
+            handleRequest(Operation.POST, request, response);
+        } catch (Base64DecodingException e) {
+            log.error(base64ErrorMessage + e.getMessage());
+        }
+    }
 
 	@Override
 	protected void doPut(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(Operation.PUT, request, response);
-	}
+        try {
+            handleRequest(Operation.PUT, request, response);
+        } catch (Base64DecodingException e) {
+            log.error(base64ErrorMessage + e.getMessage());
+        }
+    }
 
 	@Override
 	protected void doDelete(HttpServletRequest request,
 			HttpServletResponse response) throws ServletException, IOException {
-		handleRequest(Operation.DELETE, request, response);
-	}
+        try {
+            handleRequest(Operation.DELETE, request, response);
+        } catch (Base64DecodingException e) {
+            log.error(base64ErrorMessage + e.getMessage());
+        }
+    }
 
 	/**
 	 * Handle all requests to the API -- i.e., authenticate to the API, restrict
 	 * access based on client's IP address, parse the request URL, and pass
 	 * control to the appropriate resource.
 	 * 
-	 * @param operation
-	 *            HTTP operation being performed (e.g., GET, POST, PUT, DELETE)
-	 * @param request
-	 *            HTTP request
-	 * @param response
-	 *            HTTP response
+	 * @param operation HTTP operation being performed (e.g., GET, POST, PUT, DELETE)
+	 * @param request HTTP request
+	 * @param response HTTP response
 	 * @throws ServletException
 	 * @throws IOException
 	 */
 	private void handleRequest(Operation operation, HttpServletRequest request,
-			HttpServletResponse response) throws ServletException, IOException {
+			HttpServletResponse response) throws ServletException, IOException, Base64DecodingException {
 
 		// Implement BASIC Authentication and restrict by client IP address
 		String auth = request.getHeader("Authorization");
