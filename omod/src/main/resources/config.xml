@@ -18,10 +18,6 @@
 	<!-- /Base Module Properties -->
 	
 	<require_version>1.9.0</require_version>
-
-	<require_modules>
-		<require_module version="1.4.4.2">org.openmrs.module.restmodule</require_module>
-	</require_modules>
 	
 	<!-- Extensions -->
 	<extension>
@@ -61,7 +57,7 @@
 
 	<!-- Required Global Properties -->
 	<globalProperty>
-		<property>pcslabinterface.queue_dir</property> <!-- Must start with `moduleId.` -->
+		<property>@MODULE_ID@.queue_dir</property> <!-- Must start with `moduleId.` -->
 		<defaultValue>pcslabinterface/queue</defaultValue>
 		<description>
 			Directory containing the PCSLabInterface queue items. This will contain HL7 text files submitted by
@@ -69,7 +65,7 @@
 		</description>
 	</globalProperty>
 	<globalProperty>
-		<property>pcslabinterface.queue_archive_dir</property> <!-- Must start with `moduleId.` -->
+		<property>@MODULE_ID@.queue_archive_dir</property> <!-- Must start with `moduleId.` -->
 		<defaultValue>pcslabinterface/archive/%Y/%M</defaultValue>
 		<description>
 			Directory containing the PCSLabInterface archive items.  This will contain HL7 text files that have
@@ -82,7 +78,20 @@
      		%W = week of the month
 		</description>
 	</globalProperty>
-	
+
+    <!-- Patient REST API Required global properties-->
+    <globalProperty>
+        <property>@MODULE_ID@.rest_allowed_ip_list</property>
+        <defaultValue>127.0.0.1</defaultValue>
+        <description>Whitespace-separated list of remote IP addresses allowed to access the RestModule API.  Each entry should be four numbers (0-255) separated with periods, using "*" for wildcards - e.g., "192.168.1.* 192.168.2.50" allows all clients with IP addresses beginning with 192.168.1 plus the IP address 192.168.2.50.</description>
+    </globalProperty>
+    <globalProperty>
+        <property>@MODULE_ID@.max_patient_results</property>
+        <defaultValue>50</defaultValue>
+        <description>The maximum number of results to return from any query to the @MODULE_ID@ Patient REST API.
+            Should be a whole number. If blank or zero, then no maximum number of results is imposed.</description>
+    </globalProperty>
+
 	<!-- /Required Global Properties -->
 
 	<!-- Servlets -->
