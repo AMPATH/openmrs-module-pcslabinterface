@@ -90,33 +90,6 @@ public class LabORUR01Handler extends ORUR01Handler {
 	);
 
 	/**
-	 * decide whether this handler can handle the given message
-	 *
-	 * @return fitness of this handler for the given message
-	 * @should ignore messages originating from anywhere but REFPACS or PCS
-	 */
-	public boolean canProcess(Message message) {
-		if (message != null && "ORU_R01".equals(message.getName())) {
-			ORU_R01 oru = (ORU_R01) message;
-			MSH msh = getMSH(oru);
-			String sendingApplication = msh.getSendingApplication().getNamespaceID().getValue();
-
-			// TODO remove these tests when we are ready to handle all ORU^R01 messages
-			// check for special indicators
-
-            log.debug(oru.getMSH()+" Sending application is: "+ sendingApplication);
-
-            if (!StringUtils.hasLength(sendingApplication))
-				return false;
-
-			if (allowedSendingApps.contains(sendingApplication.toLowerCase()))
-				return true;
-		}
-
-		return false;
-	}
-
-	/**
 	 * Processes an ORU R01 event message
 	 *
 	 * @should process messages with PCSLabPlus formatted PID segments
@@ -140,7 +113,7 @@ public class LabORUR01Handler extends ORUR01Handler {
 			ORU_R01 oru = (ORU_R01) message;
 
 			// if this is consumable, consume it
-			if (canProcess(oru))
+			if (isLabMessage(oru))
 				response = processLabORU_R01(oru);
 
 				// otherwise, let the ORUR01Handler class do the work
@@ -1287,4 +1260,29 @@ public class LabORUR01Handler extends ORUR01Handler {
 		return p;
 	}
 
+    /**
+     * LabORUR01Handler#isLabMessage checks whether a message is a Lab message or not.
+     * @param message
+     * @return  true or false
+     */
+    public boolean isLabMessage(Message message) {
+        if (message != null && "ORU_R01".equals(message.getName())) {
+            ORU_R01 oru = (ORU_R01) message;
+            MSH msh = getMSH(oru);
+            String sendingApplication = msh.getSendingApplication().getNamespaceID().getValue();
+
+            // TODO remove these tests when we are ready to handle all ORU^R01 messages
+            // check for special indicators
+
+            log.debug(oru.getMSH()+" Sending application is: "+ sendingApplication);
+
+            if (!StringUtils.hasLength(sendingApplication))
+                return false;
+
+            if (allowedSendingApps.contains(sendingApplication.toLowerCase()))
+                return true;
+        }
+
+        return false;
+    }
 }

@@ -114,7 +114,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 	 * @see LabORUR01Handler#canProcess(ca.uhn.hl7v2.model.Message)
 	 */
 	@Test
-	public void canProcess_shouldIgnoreMessagesOriginatingFromAnywhereButREFPACSOrPCS() throws Exception {
+	public void isLabMessage_shouldIgnoreMessagesOriginatingFromAnywhereButREFPACSOrPCS() throws Exception {
 		String hl7string = "MSH|^~\\&|PCSLABPLUS|PCS|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||16^AMRS.ELD.FORMID\r"
 				+ "PID|||12345^^M10^AMRS^MR||John3^Doe^\r"
 				+ "PV1||O|1^Unknown Location||||1^Super User (1-8)|||||||||||||||||||||||||||||||||||||20080212|||||||V\r"
@@ -125,7 +125,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 
 		Message hl7message = parser.parse(hl7string);
 
-		assertTrue(new LabORUR01Handler().canProcess(hl7message));
+		assertTrue(new LabORUR01Handler().isLabMessage(hl7message));
 
 		hl7string = "MSH|^~\\&|REFPACS|IU|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||16^AMRS.ELD.FORMID\r"
 				+ "PID|||12345^^M10^AMRS^MR||John3^Doe^\r"
@@ -137,7 +137,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 
 		hl7message = parser.parse(hl7string);
 
-		assertTrue(new LabORUR01Handler().canProcess(hl7message));
+		assertTrue(new LabORUR01Handler().isLabMessage(hl7message));
 
 		hl7string = "MSH|^~\\&|FORMENTRY|AMPATH|HL7LISTENER|AMRS.ELD|20080226102656||ORU^R01|ABC101083591|P|2.5|1||||||||16^AMRS.ELD.FORMID\r"
 				+ "PID|||12345^^M10^AMRS^MR||John3^Doe^\r"
@@ -149,7 +149,7 @@ public class LabORUR01HandlerTest extends BaseModuleContextSensitiveTest {
 
 		hl7message = parser.parse(hl7string);
 
-		assertFalse(new LabORUR01Handler().canProcess(hl7message));
+		assertFalse(new LabORUR01Handler().isLabMessage(hl7message));
 	}
 
 	/**
